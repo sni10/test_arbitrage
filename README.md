@@ -68,15 +68,6 @@ JBEX_API_SECRET=your_api_secret
 docker compose exec -T php-arb php artisan arb:price BTC/USDT
 ```
 
-**Вывод:**
-```
-Trading Pair: BTC/USDT
-Min Price: 42150.50 (Binance)
-Max Price: 42380.20 (Bybit)
-Difference: 229.70 (0.545%)
-Exchanges checked: 5
-```
-
 ### Команда: arb:opportunities
 
 Найти арбитражные возможности с фильтрацией.
@@ -94,9 +85,10 @@ docker compose exec -T php-arb php artisan arb:opportunities --top=10
 # Комбинация фильтров
 docker compose exec -T php-arb php artisan arb:opportunities --min-profit=0.3 --top=5
 ```
+-----------------------------------
 
 <details>
-  <summary> OUTPUT </summary>
+  <summary> OUTPUT docker compose exec -T php-arb php artisan arb:price BTC/USDT</summary>
 
 ```terminaloutput
 ═══════════════════════════════════════════════════════
@@ -124,6 +116,7 @@ Statistics:
 
 </details>
 
+-----------------------------------
 
 <details>
   <summary> OUTPUT docker compose exec -T php-arb php artisan arb:opportunities </summary>
@@ -264,6 +257,8 @@ Found 115 opportunities:
 
 </details>
 
+-----------------------------------
+
 <details>
   <summary> OUTPUT docker compose exec -T php-arb php artisan arb:opportunities --min-profit=0.3 --top=5 </summary>
 
@@ -293,20 +288,7 @@ Found 5 opportunities:
 
 </details>
 
-
-**Вывод:**
-```
-+----------+----------+-------------+----------+-------------+
-| Pair     | Buy      | Buy Price   | Sell     | Sell Price  | Profit % |
-+----------+----------+-------------+----------+-------------+
-| BTC/USDT | Binance  | 42150.50    | Bybit    | 42380.20    | 0.545%   |
-| ETH/USDT | Binance  | 2234.10     | Bybit    | 2245.80     | 0.524%   |
-+----------+----------+-------------+----------+-------------+
-
-Total opportunities: 2
-Pairs checked: 15
-Min profit filter: 0.1%
-```
+-----------------------------------
 
 ## Тестирование
 
