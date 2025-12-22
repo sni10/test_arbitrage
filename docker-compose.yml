@@ -7,10 +7,8 @@ services:
                 APP_ENV: ${APP_ENV}
         environment:
             APP_ENV: ${APP_ENV}
-        volumes:
-            - ./:/var/www/arb
-#        For prod
-#        command: composer run-script serve
+#        volumes:
+#            - ./:/var/www/arb
 
     postgres-arb:
       image: postgres:16
