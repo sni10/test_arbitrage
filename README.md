@@ -31,19 +31,13 @@
 
 ## Установка
 
-### 1. Создать сеть Docker (однократно)
-
-```powershell
-docker network create internal_sync_network
-```
-
-### 2. Запустить сервисы
+### 1. Запустить сервисы
 
 ```powershell
 $env:APP_ENV = "test"
 docker compose up -d --build
 ```
-### 3. Настроить .env (опционально)
+### 2. Настроить .env (опционально)
 
 Скопируйте `.env.example` в `.env` и настройте параметры:
 
