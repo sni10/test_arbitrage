@@ -41,12 +41,14 @@ class FindArbitrageCommand extends Command
         // Validate min-profit
         if ($minProfit < 0) {
             $this->error('Invalid min-profit value. Must be >= 0');
+
             return Command::FAILURE;
         }
 
         // Validate top
         if ($top !== null && $top <= 0) {
             $this->error('Invalid top value. Must be > 0');
+
             return Command::FAILURE;
         }
 
@@ -58,7 +60,8 @@ class FindArbitrageCommand extends Command
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('Error: ' . $e->getMessage());
+            $this->error('Error: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -66,28 +69,29 @@ class FindArbitrageCommand extends Command
     /**
      * Display formatted result to the console.
      *
-     * @param array $result Result from FindArbitrageUseCase
+     * @param  array  $result  Result from FindArbitrageUseCase
      */
     private function displayResult(array $result): void
     {
         $this->newLine();
-        $this->line("═══════════════════════════════════════════════════════");
-        $this->line("  Arbitrage Opportunities");
-        $this->line("═══════════════════════════════════════════════════════");
+        $this->line('═══════════════════════════════════════════════════════');
+        $this->line('  Arbitrage Opportunities');
+        $this->line('═══════════════════════════════════════════════════════');
         $this->newLine();
 
         // Display filters
-        $this->line("<fg=blue>Filters Applied:</>");
+        $this->line('<fg=blue>Filters Applied:</>');
         $this->line("  Min Profit:    {$result['min_profit_filter']}%");
-        $this->line("  Top Results:   " . ($result['top_filter'] ?? 'All'));
+        $this->line('  Top Results:   '.($result['top_filter'] ?? 'All'));
         $this->line("  Pairs Checked: {$result['pairs_checked']}");
         $this->newLine();
 
         // Check if opportunities found
         if ($result['total_found'] === 0) {
             $this->warn('No arbitrage opportunities found matching the criteria.');
-            $this->line("═══════════════════════════════════════════════════════");
+            $this->line('═══════════════════════════════════════════════════════');
             $this->newLine();
+
             return;
         }
 
@@ -99,11 +103,11 @@ class FindArbitrageCommand extends Command
         foreach ($result['opportunities'] as $opp) {
             $tableData[] = [
                 $opp['pair'],
-                $opp['buy_exchange'],
-                number_format($opp['buy_price'], 8),
-                $opp['sell_exchange'],
-                number_format($opp['sell_price'], 8),
-                number_format($opp['profit_percent'], 2) . '%',
+                $opp['buyExchange'],
+                number_format($opp['buyPrice'], 8),
+                $opp['sellExchange'],
+                number_format($opp['sellPrice'], 8),
+                number_format($opp['profitPercent'], 2).'%',
             ];
         }
 
@@ -112,7 +116,7 @@ class FindArbitrageCommand extends Command
             $tableData
         );
 
-        $this->line("═══════════════════════════════════════════════════════");
+        $this->line('═══════════════════════════════════════════════════════');
         $this->newLine();
     }
 }

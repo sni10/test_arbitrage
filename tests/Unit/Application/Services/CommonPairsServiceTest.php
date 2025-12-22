@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 class CommonPairsServiceTest extends TestCase
 {
     private LaravelCacheAdapter $cache;
+
     private CommonPairsService $service;
 
     protected function setUp(): void

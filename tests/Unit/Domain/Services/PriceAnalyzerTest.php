@@ -12,7 +12,7 @@ class PriceAnalyzerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->analyzer = new PriceAnalyzer();
+        $this->analyzer = new PriceAnalyzer;
     }
 
     public function test_find_min_max_prices_with_multiple_tickers(): void

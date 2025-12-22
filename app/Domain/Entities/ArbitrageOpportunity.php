@@ -11,12 +11,12 @@ namespace App\Domain\Entities;
 readonly class ArbitrageOpportunity
 {
     /**
-     * @param string $pair Trading pair in BASE/QUOTE format (e.g., 'BTC/USDT')
-     * @param string $buyExchange Exchange to buy from (lower price)
-     * @param string $sellExchange Exchange to sell on (higher price)
-     * @param float $buyPrice Price on buy exchange
-     * @param float $sellPrice Price on sell exchange
-     * @param float $profitPercent Profit percentage: ((sellPrice - buyPrice) / buyPrice) * 100
+     * @param  string  $pair  Trading pair in BASE/QUOTE format (e.g., 'BTC/USDT')
+     * @param  string  $buyExchange  Exchange to buy from (lower price)
+     * @param  string  $sellExchange  Exchange to sell on (higher price)
+     * @param  float  $buyPrice  Price on buy exchange
+     * @param  float  $sellPrice  Price on sell exchange
+     * @param  float  $profitPercent  Profit percentage: ((sellPrice - buyPrice) / buyPrice) * 100
      */
     public function __construct(
         public string $pair,
@@ -25,14 +25,13 @@ readonly class ArbitrageOpportunity
         public float $buyPrice,
         public float $sellPrice,
         public float $profitPercent
-    ) {
-    }
+    ) {}
 
     /**
      * Create ArbitrageOpportunity from array data.
      *
-     * @param array $data Associative array with required keys
-     * @return self
+     * @param  array  $data  Associative array with required keys
+     *
      * @throws \InvalidArgumentException If required fields are missing
      */
     public static function fromArray(array $data): self
@@ -40,7 +39,7 @@ readonly class ArbitrageOpportunity
         $required = ['pair', 'buyExchange', 'sellExchange', 'buyPrice', 'sellPrice', 'profitPercent'];
 
         foreach ($required as $field) {
-            if (!isset($data[$field])) {
+            if (! isset($data[$field])) {
                 throw new \InvalidArgumentException("Missing required field: {$field}");
             }
         }

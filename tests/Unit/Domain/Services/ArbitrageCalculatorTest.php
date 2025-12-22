@@ -13,7 +13,7 @@ class ArbitrageCalculatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->calculator = new ArbitrageCalculator();
+        $this->calculator = new ArbitrageCalculator;
     }
 
     public function test_calculate_profit_with_positive_profit(): void

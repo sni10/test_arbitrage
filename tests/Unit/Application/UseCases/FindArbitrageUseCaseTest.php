@@ -13,12 +13,13 @@ use PHPUnit\Framework\TestCase;
 class FindArbitrageUseCaseTest extends TestCase
 {
     private CommonPairsService $commonPairsService;
+
     private ArbitrageCalculator $arbitrageCalculator;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->arbitrageCalculator = new ArbitrageCalculator();
+        $this->arbitrageCalculator = new ArbitrageCalculator;
 
         // Mock Log facade to prevent "facade root not set" errors
         Log::shouldReceive('warning')->andReturnNull();
@@ -237,11 +238,12 @@ class FindArbitrageUseCaseTest extends TestCase
         $mock->method('getName')->willReturn($name);
 
         $mock->method('fetchTicker')->willReturnCallback(function ($symbol) use ($name, $pairPrices) {
-            if (!isset($pairPrices[$symbol])) {
+            if (! isset($pairPrices[$symbol])) {
                 throw new \Exception("Symbol not found: {$symbol}");
             }
 
             $timestamp = time() * 1000;
+
             return new Ticker($symbol, $pairPrices[$symbol], $name, $timestamp);
         });
 
@@ -261,11 +263,12 @@ class FindArbitrageUseCaseTest extends TestCase
                 throw new \Exception("Failed to fetch {$symbol}");
             }
 
-            if (!isset($successPairs[$symbol])) {
+            if (! isset($successPairs[$symbol])) {
                 throw new \Exception("Symbol not found: {$symbol}");
             }
 
             $timestamp = time() * 1000;
+
             return new Ticker($symbol, $successPairs[$symbol], $name, $timestamp);
         });
 

@@ -19,7 +19,7 @@ class BybitConnector extends AbstractCcxtConnector
     /**
      * Create Bybit connector with injected CCXT exchange instance.
      *
-     * @param Exchange $exchange CCXT Bybit exchange instance
+     * @param  Exchange  $exchange  CCXT Bybit exchange instance
      */
     public function __construct(Exchange $exchange)
     {

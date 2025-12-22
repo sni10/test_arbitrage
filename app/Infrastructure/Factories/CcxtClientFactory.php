@@ -13,6 +13,7 @@ use ccxt\Exchange;
 class CcxtClientFactory
 {
     private int $timeout;
+
     private bool $enableRateLimit;
 
     /**
@@ -27,16 +28,16 @@ class CcxtClientFactory
     /**
      * Create a CCXT exchange instance by name.
      *
-     * @param string $exchangeName Exchange class name (e.g., 'binance', 'bybit')
-     * @param array $options Additional options to pass to exchange constructor
-     * @return Exchange
+     * @param  string  $exchangeName  Exchange class name (e.g., 'binance', 'bybit')
+     * @param  array  $options  Additional options to pass to exchange constructor
+     *
      * @throws \Exception If exchange class doesn't exist
      */
     public function create(string $exchangeName, array $options = []): Exchange
     {
         $className = "\\ccxt\\{$exchangeName}";
 
-        if (!class_exists($className)) {
+        if (! class_exists($className)) {
             throw new \Exception("CCXT exchange class not found: {$className}");
         }
 
@@ -50,8 +51,6 @@ class CcxtClientFactory
 
     /**
      * Create Binance exchange instance.
-     *
-     * @return Exchange
      */
     public function createBinance(): Exchange
     {
@@ -60,8 +59,6 @@ class CcxtClientFactory
 
     /**
      * Create Poloniex exchange instance.
-     *
-     * @return Exchange
      */
     public function createPoloniex(): Exchange
     {
@@ -70,8 +67,6 @@ class CcxtClientFactory
 
     /**
      * Create Bybit exchange instance.
-     *
-     * @return Exchange
      */
     public function createBybit(): Exchange
     {
@@ -80,8 +75,6 @@ class CcxtClientFactory
 
     /**
      * Create WhiteBIT exchange instance.
-     *
-     * @return Exchange
      */
     public function createWhitebit(): Exchange
     {

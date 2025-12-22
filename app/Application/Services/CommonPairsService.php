@@ -16,16 +16,15 @@ class CommonPairsService
     private const CACHE_KEY = 'common_pairs';
 
     /**
-     * @param array $exchanges Array of ExchangeConnectorInterface instances
-     * @param LaravelCacheAdapter $cache Cache adapter for storing results
-     * @param int $cacheTtl Cache TTL in seconds (default: 3600 = 1 hour)
+     * @param  array  $exchanges  Array of ExchangeConnectorInterface instances
+     * @param  LaravelCacheAdapter  $cache  Cache adapter for storing results
+     * @param  int  $cacheTtl  Cache TTL in seconds (default: 3600 = 1 hour)
      */
     public function __construct(
         private array $exchanges,
         private LaravelCacheAdapter $cache,
         private int $cacheTtl = 3600
-    ) {
-    }
+    ) {}
 
     /**
      * Get list of trading pairs available on ALL exchanges.
@@ -34,6 +33,7 @@ class CommonPairsService
      * If an exchange is temporarily unavailable, it will be skipped with a warning log.
      *
      * @return array<string> Array of trading pair symbols (e.g., ['BTC/USDT', 'ETH/USDT'])
+     *
      * @throws \Exception If no exchanges are available or no common pairs found
      */
     public function getCommonPairs(): array
@@ -47,6 +47,7 @@ class CommonPairsService
      * Fetch common pairs from all exchanges (without cache).
      *
      * @return array<string> Array of common trading pair symbols
+     *
      * @throws \Exception If no exchanges are available or no common pairs found
      */
     private function fetchCommonPairs(): array
@@ -70,7 +71,7 @@ class CommonPairsService
         }
 
         if (empty($pairsByExchange)) {
-            throw new \Exception('All exchanges are unavailable. Failed exchanges: ' . implode(', ', $failedExchanges));
+            throw new \Exception('All exchanges are unavailable. Failed exchanges: '.implode(', ', $failedExchanges));
         }
 
         // Find intersection of all pairs
@@ -78,7 +79,7 @@ class CommonPairsService
 
         if (empty($commonPairs)) {
             $exchangeNames = array_keys($pairsByExchange);
-            throw new \Exception('No common pairs found across exchanges: ' . implode(', ', $exchangeNames));
+            throw new \Exception('No common pairs found across exchanges: '.implode(', ', $exchangeNames));
         }
 
         return $commonPairs;
@@ -87,7 +88,7 @@ class CommonPairsService
     /**
      * Find intersection of trading pairs across all exchanges.
      *
-     * @param array<string, array<string>> $pairsByExchange Pairs grouped by exchange name
+     * @param  array<string, array<string>>  $pairsByExchange  Pairs grouped by exchange name
      * @return array<string> Array of common pairs
      */
     private function findIntersection(array $pairsByExchange): array

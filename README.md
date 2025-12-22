@@ -1,66 +1,409 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Arbitrage Analyzer
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Консольное приложение для анализа арбитражных возможностей на криптовалютных биржах.
 
-## About Laravel
+## Описание
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Система анализирует цены торговых пар на 5 биржах (Binance, Poloniex, Bybit, WhiteBIT, JBEX) и находит арбитражные возможности. Реализована на базе Laravel 11 с использованием Clean Architecture.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Основные возможности:**
+- Получение лучших цен по торговой паре
+- Поиск арбитражных возможностей с фильтрацией по прибыли
+- Кэширование списка общих пар (TTL: 1 час)
+- Graceful degradation при недоступности бирж
+- Retry-логика для сетевых запросов
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Требования
 
-## Learning Laravel
+- Docker & Docker Compose
+- PHP 8.2+ (в контейнере)
+- PostgreSQL 16 (в контейнере)
+- Redis 7.0 (в контейнере)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Установка
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 1. Создать сеть Docker (однократно)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```powershell
+docker network create internal_sync_network
+```
 
-## Laravel Sponsors
+### 2. Запустить сервисы
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```powershell
+$env:APP_ENV = "local"
+docker compose up -d --build
+```
 
-### Premium Partners
+### 3. Установить зависимости
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```powershell
+docker compose exec -T php-arb composer install
+```
 
-## Contributing
+### 4. Настроить приложение
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```powershell
+# Сгенерировать ключ приложения
+docker compose exec -T php-arb php artisan key:generate
 
-## Code of Conduct
+# Выполнить миграции
+docker compose exec -T php-arb php artisan migrate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 5. Настроить .env (опционально)
 
-## Security Vulnerabilities
+Скопируйте `.env.example` в `.env` и настройте параметры:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+# API таймауты и лимиты
+API_TIMEOUT=5000
+RATE_LIMIT_DELAY=200
+PAIRS_CACHE_TTL=3600
 
-## License
+# API ключи бирж (опционально)
+JBEX_API_KEY=your_api_key
+JBEX_API_SECRET=your_api_secret
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Использование
+
+### Команда: arb:price
+
+Получить лучшие цены по торговой паре на всех биржах.
+
+```powershell
+docker compose exec -T php-arb php artisan arb:price BTC/USDT
+```
+
+**Вывод:**
+```
+Trading Pair: BTC/USDT
+Min Price: 42150.50 (Binance)
+Max Price: 42380.20 (Bybit)
+Difference: 229.70 (0.545%)
+Exchanges checked: 5
+```
+
+### Команда: arb:opportunities
+
+Найти арбитражные возможности с фильтрацией.
+
+```powershell
+# Все возможности с прибылью >= 0.1%
+docker compose exec -T php-arb php artisan arb:opportunities
+
+# Возможности с прибылью >= 0.5%
+docker compose exec -T php-arb php artisan arb:opportunities --min-profit=0.5
+
+# Топ-10 возможностей
+docker compose exec -T php-arb php artisan arb:opportunities --top=10
+
+# Комбинация фильтров
+docker compose exec -T php-arb php artisan arb:opportunities --min-profit=0.3 --top=5
+```
+
+<details>
+  <summary> OUTPUT </summary>
+
+```terminaloutput
+═══════════════════════════════════════════════════════
+  Best Prices for BTC/USDT
+═══════════════════════════════════════════════════════
+
+Lowest Price:
+  Exchange:  Poloniex
+  Price:     89652.05
+  Time:      57945-07-06 22:44:14
+
+Highest Price:
+  Exchange:  Binance
+  Price:     89703.99
+  Time:      57945-07-06 23:20:13
+
+Price Difference:
+  Absolute:  51.940000000002
+  Percent:   0.057935094624163%
+
+Statistics:
+  Exchanges checked: 4
+═══════════════════════════════════════════════════════
+```
+
+</details>
+
+
+<details>
+  <summary> OUTPUT docker compose exec -T php-arb php artisan arb:opportunities </summary>
+
+```terminaloutput
+═══════════════════════════════════════════════════════
+Arbitrage Opportunities
+═══════════════════════════════════════════════════════
+
+Filters Applied:
+Min Profit:    0.1%
+Top Results:   All
+Pairs Checked: 127
+
+Found 115 opportunities:
+
++-------------+----------+-----------------+----------+-----------------+-------------+
+| Pair        | Buy From | Buy Price       | Sell To  | Sell Price      | Profit %    |
++-------------+----------+-----------------+----------+-----------------+-------------+
+| KAIA/USDT   | Poloniex | 0.00000910      | Binance  | 0.06020000      | 661,438.46% |
+| TRUMP/USDT  | Poloniex | 0.06000000      | Binance  | 5.03200000      | 8,286.67%   |
+| RED/USDT    | Poloniex | 0.02100000      | Binance  | 0.21600000      | 928.57%     |
+| PORTAL/USDT | WhiteBIT | 0.02290000      | Poloniex | 0.11100000      | 384.72%     |
+| MORPHO/USDT | Poloniex | 0.40000000      | Binance  | 1.23000000      | 207.50%     |
+| JTO/USDT    | WhiteBIT | 0.35800000      | Poloniex | 0.77300000      | 115.92%     |
+| ALT/USDT    | Poloniex | 0.00582000      | Binance  | 0.01166000      | 100.34%     |
+| LUNA/USDT   | Poloniex | 0.06200000      | Binance  | 0.11610000      | 87.26%      |
+| STX/USDT    | WhiteBIT | 0.25220000      | Poloniex | 0.42000000      | 66.53%      |
+| HAEDAL/USDT | Poloniex | 0.02360000      | Binance  | 0.03840000      | 62.71%      |
+| GALA/USDT   | Binance  | 0.00626000      | Poloniex | 0.00999000      | 59.58%      |
+| TOWNS/USDT  | Binance  | 0.00556000      | Poloniex | 0.00847000      | 52.34%      |
+| NEWT/USDT   | Poloniex | 0.06670000      | Binance  | 0.09980000      | 49.63%      |
+| RENDER/USDT | WhiteBIT | 1.31400000      | Poloniex | 1.83060000      | 39.32%      |
+| AIXBT/USDT  | WhiteBIT | 0.02910000      | Poloniex | 0.04030000      | 38.49%      |
+| APE/USDT    | Poloniex | 0.15000000      | Binance  | 0.20040000      | 33.60%      |
+| BLUR/USDT   | WhiteBIT | 0.02790000      | Poloniex | 0.03540000      | 26.88%      |
+| AVNT/USDT   | WhiteBIT | 0.26350000      | Poloniex | 0.33130000      | 25.73%      |
+| EGLD/USDT   | WhiteBIT | 6.41920000      | Poloniex | 7.91000000      | 23.22%      |
+| LUNC/USDT   | Poloniex | 0.00003300      | Binance  | 0.00004006      | 21.39%      |
+| WLFI/USDT   | Poloniex | 0.11320000      | Binance  | 0.13510000      | 19.35%      |
+| TNSR/USDT   | Binance  | 0.08490000      | Poloniex | 0.10130000      | 19.32%      |
+| GMX/USDT    | Poloniex | 7.18000000      | WhiteBIT | 8.40000000      | 16.99%      |
+| SNX/USDT    | Binance  | 0.42500000      | Poloniex | 0.49200000      | 15.76%      |
+| WOO/USDT    | Poloniex | 0.02340000      | Binance  | 0.02680000      | 14.53%      |
+| ID/USDT     | WhiteBIT | 0.06147000      | Poloniex | 0.07000000      | 13.88%      |
+| KSM/USDT    | WhiteBIT | 7.02900000      | Poloniex | 8.00000000      | 13.81%      |
+| UMA/USDT    | WhiteBIT | 0.70990000      | Poloniex | 0.80700000      | 13.68%      |
+| PEOPLE/USDT | Poloniex | 0.00850000      | WhiteBIT | 0.00950600      | 11.84%      |
+| CAKE/USDT   | Poloniex | 1.68900000      | Binance  | 1.85800000      | 10.01%      |
+| CGPT/USDT   | WhiteBIT | 0.02898000      | Poloniex | 0.03180000      | 9.73%       |
+| BICO/USDT   | Poloniex | 0.03830000      | WhiteBIT | 0.04200000      | 9.66%       |
+| ZK/USDT     | Poloniex | 0.02530000      | WhiteBIT | 0.02762000      | 9.17%       |
+| LINEA/USDT  | Poloniex | 0.00601000      | Binance  | 0.00653000      | 8.65%       |
+| BOME/USDT   | Poloniex | 0.00054550      | Binance  | 0.00059000      | 8.16%       |
+| NXPC/USDT   | Poloniex | 0.35700000      | Binance  | 0.38530000      | 7.93%       |
+| MET/USDT    | Poloniex | 0.22600000      | Binance  | 0.24300000      | 7.52%       |
+| BAT/USDT    | WhiteBIT | 0.21280000      | Poloniex | 0.22860000      | 7.42%       |
+| GMT/USDT    | Poloniex | 0.01370000      | WhiteBIT | 0.01467000      | 7.08%       |
+| NEXO/USDT   | WhiteBIT | 0.93470000      | Poloniex | 1.00000000      | 6.99%       |
+| RUNE/USDT   | Poloniex | 0.55450000      | Binance  | 0.59200000      | 6.76%       |
+| S/USDT      | WhiteBIT | 0.07500000      | Poloniex | 0.08000000      | 6.67%       |
+| BONK/USDT   | Poloniex | 0.00000770      | Binance  | 0.00000821      | 6.65%       |
+| FXS/USDT    | Poloniex | 0.62000000      | WhiteBIT | 0.66100000      | 6.61%       |
+| CRV/USDT    | Poloniex | 0.35000000      | WhiteBIT | 0.37310000      | 6.60%       |
+| WAL/USDT    | Poloniex | 0.12000000      | Binance  | 0.12740000      | 6.17%       |
+| ONDO/USDT   | Poloniex | 0.37670000      | Binance  | 0.39970000      | 6.11%       |
+| AXS/USDT    | Poloniex | 0.81000000      | Binance  | 0.85900000      | 6.05%       |
+| PENDLE/USDT | Poloniex | 1.80000000      | Binance  | 1.90800000      | 6.00%       |
+| JUP/USDT    | Poloniex | 0.18600000      | Binance  | 0.19530000      | 5.00%       |
+| RPL/USDT    | WhiteBIT | 1.86000000      | Poloniex | 1.95000000      | 4.84%       |
+| QTUM/USDT   | WhiteBIT | 1.26960000      | Poloniex | 1.32800000      | 4.60%       |
+| ENA/USDT    | Poloniex | 0.20220000      | Binance  | 0.21090000      | 4.30%       |
+| AGLD/USDT   | WhiteBIT | 0.25000000      | Poloniex | 0.26000000      | 4.00%       |
+| RDNT/USDT   | WhiteBIT | 0.00937000      | Poloniex | 0.00970000      | 3.52%       |
+| LRC/USDT    | Poloniex | 0.05450000      | Binance  | 0.05630000      | 3.30%       |
+| SSV/USDT    | WhiteBIT | 3.76530000      | Poloniex | 3.88000000      | 3.05%       |
+| EIGEN/USDT  | Binance  | 0.39200000      | Poloniex | 0.40300000      | 2.81%       |
+| XTZ/USDT    | Poloniex | 0.44000000      | Binance  | 0.45100000      | 2.50%       |
+| ENJ/USDT    | Poloniex | 0.02680000      | Binance  | 0.02741000      | 2.28%       |
+| C98/USDT    | WhiteBIT | 0.02200000      | Poloniex | 0.02250000      | 2.27%       |
+| OM/USDT     | Binance  | 0.07070000      | Poloniex | 0.07197000      | 1.80%       |
+| INJ/USDT    | Poloniex | 4.60010000      | Binance  | 4.68200000      | 1.78%       |
+| LTC/BTC     | Poloniex | 0.00086400      | Binance  | 0.00087900      | 1.74%       |
+| ENS/USDT    | WhiteBIT | 9.66270000      | Poloniex | 9.82000000      | 1.63%       |
+| ZRO/USDT    | Binance  | 1.31300000      | Poloniex | 1.33300000      | 1.52%       |
+| STRK/USDT   | Poloniex | 0.08000000      | Binance  | 0.08120000      | 1.50%       |
+| WIF/USDT    | WhiteBIT | 0.33890000      | Poloniex | 0.34380000      | 1.45%       |
+| YFI/USDT    | Poloniex | 3,380.14000000  | Binance  | 3,427.00000000  | 1.39%       |
+| SUSHI/USDT  | WhiteBIT | 0.29730000      | Poloniex | 0.30130000      | 1.35%       |
+| CHZ/USDT    | WhiteBIT | 0.03551400      | Poloniex | 0.03597000      | 1.28%       |
+| GRT/USDT    | Poloniex | 0.03810000      | Binance  | 0.03853000      | 1.13%       |
+| G/USDT      | WhiteBIT | 0.00445000      | Poloniex | 0.00450000      | 1.12%       |
+| AEVO/USDT   | Poloniex | 0.03600000      | Binance  | 0.03640000      | 1.11%       |
+| ETHFI/USDT  | WhiteBIT | 0.71900000      | Poloniex | 0.72660000      | 1.06%       |
+| TRX/USDC    | WhiteBIT | 0.28325800      | Poloniex | 0.28608000      | 1.00%       |
+| SKY/USDT    | Binance  | 0.06760000      | Poloniex | 0.06823000      | 0.93%       |
+| FET/USDT    | Poloniex | 0.20800000      | Binance  | 0.20960000      | 0.77%       |
+| COMP/USDT   | Poloniex | 24.00000000     | WhiteBIT | 24.18000000     | 0.75%       |
+| ICP/USDT    | Binance  | 3.05400000      | Poloniex | 3.07200000      | 0.59%       |
+| SOL/BTC     | Poloniex | 0.00141500      | WhiteBIT | 0.00142173      | 0.48%       |
+| SAND/USDT   | Poloniex | 0.11700000      | WhiteBIT | 0.11753600      | 0.46%       |
+| DOT/BTC     | Binance  | 0.00002041      | Poloniex | 0.00002050      | 0.44%       |
+| IMX/USDT    | Binance  | 0.23100000      | WhiteBIT | 0.23200000      | 0.43%       |
+| ASTER/USDT  | Poloniex | 0.70700000      | WhiteBIT | 0.71000000      | 0.42%       |
+| JST/USDT    | Binance  | 0.03979000      | Poloniex | 0.03994000      | 0.38%       |
+| XLM/BTC     | WhiteBIT | 0.00000250      | Binance  | 0.00000251      | 0.37%       |
+| TON/USDT    | WhiteBIT | 1.46600000      | Poloniex | 1.47100000      | 0.34%       |
+| AAVE/USDT   | Poloniex | 154.84000000    | Binance  | 155.35000000    | 0.33%       |
+| SUI/USDT    | Poloniex | 1.47180000      | Binance  | 1.47660000      | 0.33%       |
+| BTC/USDC    | Poloniex | 89,219.77000000 | WhiteBIT | 89,496.75000000 | 0.31%       |
+| ARB/USDT    | WhiteBIT | 0.18970000      | Poloniex | 0.19020000      | 0.26%       |
+| LDO/USDT    | WhiteBIT | 0.54860000      | Poloniex | 0.55000000      | 0.26%       |
+| PEPE/USDT   | WhiteBIT | 0.00000402      | Binance  | 0.00000403      | 0.22%       |
+| ETH/USDC    | Poloniex | 3,032.90000000  | Binance  | 3,039.27000000  | 0.21%       |
+| ADA/USDT    | WhiteBIT | 0.37602700      | Binance  | 0.37680000      | 0.21%       |
+| LTC/USDC    | WhiteBIT | 78.66000000     | Poloniex | 78.82000000     | 0.20%       |
+| DOT/USDT    | WhiteBIT | 1.82650000      | Binance  | 1.83000000      | 0.19%       |
+| POL/USDT    | WhiteBIT | 0.10890000      | Poloniex | 0.10910000      | 0.18%       |
+| A/USDT      | Poloniex | 0.16420000      | Binance  | 0.16450000      | 0.18%       |
+| XRP/USDC    | Poloniex | 1.92460000      | Binance  | 1.92810000      | 0.18%       |
+| ZRX/USDT    | WhiteBIT | 0.12130000      | Poloniex | 0.12150000      | 0.16%       |
+| MANA/USDT   | Poloniex | 0.12480000      | Binance  | 0.12500000      | 0.16%       |
+| FIL/USDT    | Poloniex | 1.31400000      | Binance  | 1.31600000      | 0.15%       |
+| FLOKI/USDT  | WhiteBIT | 0.00004083      | Poloniex | 0.00004089      | 0.15%       |
+| SHIB/USDT   | Poloniex | 0.00000732      | Binance  | 0.00000733      | 0.14%       |
+| DOGE/USDT   | WhiteBIT | 0.13354340      | Binance  | 0.13372000      | 0.13%       |
+| NEAR/USDT   | Poloniex | 1.55400000      | Binance  | 1.55600000      | 0.13%       |
+| LINK/USDT   | Poloniex | 12.73460000     | Binance  | 12.75000000     | 0.12%       |
+| XRP/BTC     | Binance  | 0.00002154      | WhiteBIT | 0.00002156      | 0.11%       |
+| ATOM/USDT   | WhiteBIT | 1.97880000      | Binance  | 1.98100000      | 0.11%       |
+| OP/USDT     | WhiteBIT | 0.27590000      | Binance  | 0.27620000      | 0.11%       |
+| BTC/USDT    | Poloniex | 89,376.77000000 | Binance  | 89,470.00000000 | 0.10%       |
+| SUN/USDT    | Binance  | 0.02041000      | Poloniex | 0.02043110      | 0.10%       |
+| SOL/USDT    | WhiteBIT | 127.03000000    | Binance  | 127.16000000    | 0.10%       |
++-------------+----------+-----------------+----------+-----------------+-------------+
+═══════════════════════════════════════════════════════
+```
+
+</details>
+
+<details>
+  <summary> OUTPUT docker compose exec -T php-arb php artisan arb:opportunities --min-profit=0.3 --top=5 </summary>
+
+```terminaloutput
+═══════════════════════════════════════════════════════
+  Arbitrage Opportunities
+═══════════════════════════════════════════════════════
+
+Filters Applied:
+  Min Profit:    0.3%
+  Top Results:   5
+  Pairs Checked: 127
+
+Found 5 opportunities:
+
++-------------+----------+------------+----------+------------+-------------+
+| Pair        | Buy From | Buy Price  | Sell To  | Sell Price | Profit %    |
++-------------+----------+------------+----------+------------+-------------+
+| KAIA/USDT   | Poloniex | 0.00000910 | Binance  | 0.06020000 | 661,438.46% |
+| TRUMP/USDT  | Poloniex | 0.06000000 | Binance  | 5.03200000 | 8,286.67%   |
+| RED/USDT    | Poloniex | 0.02100000 | Binance  | 0.21630000 | 930.00%     |
+| PORTAL/USDT | Binance  | 0.02260000 | Poloniex | 0.11100000 | 391.15%     |
+| MORPHO/USDT | Poloniex | 0.40000000 | Binance  | 1.22900000 | 207.25%     |
++-------------+----------+------------+----------+------------+-------------+
+═══════════════════════════════════════════════════════
+```
+
+</details>
+
+
+**Вывод:**
+```
++----------+----------+-------------+----------+-------------+
+| Pair     | Buy      | Buy Price   | Sell     | Sell Price  | Profit % |
++----------+----------+-------------+----------+-------------+
+| BTC/USDT | Binance  | 42150.50    | Bybit    | 42380.20    | 0.545%   |
+| ETH/USDT | Binance  | 2234.10     | Bybit    | 2245.80     | 0.524%   |
++----------+----------+-------------+----------+-------------+
+
+Total opportunities: 2
+Pairs checked: 15
+Min profit filter: 0.1%
+```
+
+## Тестирование
+
+### Запустить все тесты
+
+```powershell
+docker compose exec -T php-arb php vendor/bin/phpunit
+```
+
+### Запустить unit-тесты
+
+```powershell
+docker compose exec -T php-arb php vendor/bin/phpunit tests/Unit
+```
+
+### Запустить feature-тесты
+
+```powershell
+docker compose exec -T php-arb php vendor/bin/phpunit tests/Feature
+```
+
+## Архитектура
+
+Проект следует принципам Clean Architecture:
+
+```
+app/
+├── Domain/              # Бизнес-логика (чистый PHP)
+│   ├── Contracts/       # Интерфейсы
+│   ├── Entities/        # Сущности (Ticker, ArbitrageOpportunity)
+│   └── Services/        # Доменные сервисы
+├── Application/         # Use-cases и оркестрация
+│   ├── Services/        # Сервисы приложения
+│   └── UseCases/        # Сценарии использования
+├── Infrastructure/      # Реализация портов
+│   ├── Cache/           # Адаптеры кэша
+│   ├── Connectors/      # Коннекторы бирж
+│   └── Factories/       # Фабрики клиентов
+└── Console/Commands/    # Artisan команды
+```
+
+**Зависимости:** `Http -> Application -> Domain <- Infrastructure`
+
+## Поддерживаемые биржи
+
+- **Binance** (CCXT)
+- **Poloniex** (CCXT)
+- **Bybit** (CCXT)
+- **WhiteBIT** (CCXT)
+- **JBEX** (Custom REST API)
+
+## Защита от Rate-Limit
+
+Система оптимизирована для минимизации риска блокировки со стороны бирж:
+
+### Текущая оптимизация
+
+- **`arb:opportunities`**: использует `fetchTickers()` — **1 запрос на биржу** (всего 5 запросов), вместо N×5 запросов
+- **`arb:price`**: использует `fetchTicker()` — 5 запросов для одной пары (приемлемо)
+- **Retry-логика**: 3 попытки с задержкой 200 мс между попытками
+- **CCXT rate-limiter**: встроенная защита от превышения лимитов
+- **Graceful degradation**: продолжение работы при недоступности отдельных бирж
+
+### Рекомендации
+
+Для снижения риска бана:
+
+1. **Используйте API ключи** (особенно для JBEX) — авторизованные запросы имеют более высокие лимиты
+2. **Увеличьте задержки** при частом использовании:
+   ```env
+   RATE_LIMIT_DELAY=500  # увеличить с 200 до 500 мс
+   API_TIMEOUT=10000     # увеличить таймаут до 10 сек
+   ```
+3. **Ограничьте частоту запуска** команд — не запускайте `arb:opportunities` чаще 1 раза в минуту
+4. **Отключите ненужные биржи** в `.env`:
+   ```env
+   BINANCE_ENABLED=true
+   JBEX_ENABLED=false    # отключить при отсутствии ключей
+   ```
+5. **Используйте кэш** — список общих пар кэшируется на 1 час (настраивается через `PAIRS_CACHE_TTL`)
+
+### Лимиты бирж (публичные API)
+
+- **Binance**: 1200 запросов/мин (weight-based)
+- **Bybit**: 120 запросов/мин
+- **Poloniex**: 6 запросов/сек
+- **WhiteBIT**: 600 запросов/5 мин
+- **JBEX**: зависит от наличия API ключа
+
+## Лицензия
+
+Proprietary

@@ -19,15 +19,18 @@ use Illuminate\Support\Facades\Log;
 abstract class AbstractCcxtConnector implements ExchangeConnectorInterface
 {
     protected Exchange $exchange;
+
     protected string $exchangeName;
+
     protected int $retryAttempts = 3;
+
     protected int $retryDelay;
 
     /**
      * Initialize the CCXT connector with injected exchange instance.
      *
-     * @param Exchange $exchange CCXT exchange instance (injected via factory)
-     * @param string $exchangeName Human-readable exchange name
+     * @param  Exchange  $exchange  CCXT exchange instance (injected via factory)
+     * @param  string  $exchangeName  Human-readable exchange name
      */
     public function __construct(Exchange $exchange, string $exchangeName)
     {
@@ -43,6 +46,7 @@ abstract class AbstractCcxtConnector implements ExchangeConnectorInterface
     {
         return $this->executeWithRetry(function () {
             $this->loadMarketsIfNeeded();
+
             return $this->exchange->fetch_markets();
         });
     }
@@ -74,6 +78,7 @@ abstract class AbstractCcxtConnector implements ExchangeConnectorInterface
         return $this->executeWithRetry(function () use ($symbol) {
             $this->loadMarketsIfNeeded();
             $tickerData = $this->exchange->fetch_ticker($symbol);
+
             return $this->createTickerFromData($tickerData, $symbol);
         });
     }
@@ -122,7 +127,7 @@ abstract class AbstractCcxtConnector implements ExchangeConnectorInterface
     /**
      * Normalize exchange-specific symbol to BASE/QUOTE format.
      *
-     * @param string $symbol Symbol in any format
+     * @param  string  $symbol  Symbol in any format
      * @return string Normalized symbol (e.g., 'BTC/USDT')
      */
     protected function normalizeSymbol(string $symbol): string
@@ -135,8 +140,9 @@ abstract class AbstractCcxtConnector implements ExchangeConnectorInterface
     /**
      * Execute a callable with retry logic.
      *
-     * @param callable $callback Function to execute
+     * @param  callable  $callback  Function to execute
      * @return mixed Result of the callback
+     *
      * @throws \Exception If all retry attempts fail
      */
     protected function executeWithRetry(callable $callback)
@@ -175,9 +181,8 @@ abstract class AbstractCcxtConnector implements ExchangeConnectorInterface
     /**
      * Create a Ticker entity from CCXT ticker data.
      *
-     * @param array $tickerData CCXT ticker data
-     * @param string $symbol Normalized symbol
-     * @return Ticker
+     * @param  array  $tickerData  CCXT ticker data
+     * @param  string  $symbol  Normalized symbol
      */
     protected function createTickerFromData(array $tickerData, string $symbol): Ticker
     {

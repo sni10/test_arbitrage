@@ -6,7 +6,6 @@ use App\Domain\Entities\Ticker;
 use App\Infrastructure\Connectors\BinanceConnector;
 use App\Infrastructure\Factories\CcxtClientFactory;
 use ccxt\Exchange;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -18,6 +17,7 @@ use Tests\TestCase;
 class BinanceConnectorTest extends TestCase
 {
     private BinanceConnector $connector;
+
     private Exchange $mockExchange;
 
     protected function setUp(): void
@@ -105,7 +105,7 @@ class BinanceConnectorTest extends TestCase
         $this->mockExchange
             ->expects($this->once())
             ->method('load_markets')
-            ->willReturnCallback(function () use ($fixtureData) {
+            ->willReturnCallback(function () {
                 $this->mockExchange->markets = ['BTC/USDT' => [], 'ETH/USDT' => []];
             });
 
@@ -138,7 +138,7 @@ class BinanceConnectorTest extends TestCase
         $this->mockExchange
             ->expects($this->once())
             ->method('load_markets')
-            ->willReturnCallback(function () use ($fixtureData) {
+            ->willReturnCallback(function () {
                 $this->mockExchange->markets = ['BTC/USDT' => [], 'ETH/USDT' => []];
             });
 

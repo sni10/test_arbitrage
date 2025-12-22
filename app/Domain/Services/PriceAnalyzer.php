@@ -15,8 +15,9 @@ class PriceAnalyzer
     /**
      * Find minimum and maximum prices from array of tickers.
      *
-     * @param array<Ticker> $tickers Array of Ticker entities
+     * @param  array<Ticker>  $tickers  Array of Ticker entities
      * @return array{min: Ticker, max: Ticker} Array with 'min' and 'max' Ticker entities
+     *
      * @throws \InvalidArgumentException If tickers array is empty
      */
     public function findMinMaxPrices(array $tickers): array
@@ -29,7 +30,7 @@ class PriceAnalyzer
         $maxTicker = $tickers[0];
 
         foreach ($tickers as $ticker) {
-            if (!$ticker instanceof Ticker) {
+            if (! $ticker instanceof Ticker) {
                 throw new \InvalidArgumentException('All elements must be Ticker instances');
             }
 
@@ -51,9 +52,10 @@ class PriceAnalyzer
     /**
      * Calculate absolute and percentage difference between two prices.
      *
-     * @param float $min Minimum price
-     * @param float $max Maximum price
+     * @param  float  $min  Minimum price
+     * @param  float  $max  Maximum price
      * @return array{absolute: float, percent: float} Difference in absolute value and percentage
+     *
      * @throws \InvalidArgumentException If min price is zero or negative
      */
     public function calculateDifference(float $min, float $max): array

@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Http;
 class HttpClientFactory
 {
     private int $timeout;
+
     private int $retryAttempts;
+
     private int $retryDelay;
 
     /**
@@ -30,8 +32,7 @@ class HttpClientFactory
     /**
      * Create a configured HTTP client with retry logic.
      *
-     * @param array $headers Additional headers to include
-     * @return PendingRequest
+     * @param  array  $headers  Additional headers to include
      */
     public function create(array $headers = []): PendingRequest
     {
@@ -45,14 +46,13 @@ class HttpClientFactory
     /**
      * Create HTTP client for JBEX API.
      *
-     * @param string $apiKey JBEX API key (optional)
-     * @return PendingRequest
+     * @param  string  $apiKey  JBEX API key (optional)
      */
     public function createForJbex(string $apiKey = ''): PendingRequest
     {
         $headers = [];
 
-        if (!empty($apiKey)) {
+        if (! empty($apiKey)) {
             $headers['X-BH-APIKEY'] = $apiKey;
         }
 

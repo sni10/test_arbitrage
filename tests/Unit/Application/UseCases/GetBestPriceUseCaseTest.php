@@ -16,7 +16,7 @@ class GetBestPriceUseCaseTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->priceAnalyzer = new PriceAnalyzer();
+        $this->priceAnalyzer = new PriceAnalyzer;
 
         // Mock Log facade to prevent "facade root not set" errors
         Log::shouldReceive('warning')->andReturnNull();
