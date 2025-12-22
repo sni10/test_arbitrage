@@ -39,5 +39,7 @@ yarn-error.log
 /.junie/
 test_auth_prod.php
 /examples/
+/docs/
 !/.env.example
 
+/.output.txt

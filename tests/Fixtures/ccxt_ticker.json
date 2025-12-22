@@ -1,0 +1,25 @@
+{
+  "symbol": "BTC/USDT",
+  "timestamp": 1700000000000,
+  "datetime": "2023-11-14T00:00:00.000Z",
+  "high": 38000.0,
+  "low": 35000.0,
+  "bid": 36500.0,
+  "bidVolume": 12.5,
+  "ask": 36510.0,
+  "askVolume": 10.2,
+  "vwap": 36200.0,
+  "open": 35500.0,
+  "close": 36500.0,
+  "last": 36500.0,
+  "previousClose": 35400.0,
+  "change": 1100.0,
+  "percentage": 3.11,
+  "average": 36000.0,
+  "baseVolume": 1250.4,
+  "quoteVolume": 45000000.0,
+  "info": {
+    "symbol": "BTCUSDT",
+    "price": "36500.00"
+  }
+}

@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     procps \
     libssh2-1-dev \
     net-tools \
+    libgmp-dev \
     lsof \
     libfreetype6-dev \
     apt-transport-https \
@@ -29,7 +30,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     rsync \
     supervisor \
-    && docker-php-ext-install mbstring exif pcntl bcmath gd pdo pdo_pgsql zip sockets simplexml \
+    && docker-php-ext-install mbstring exif pcntl bcmath gd pdo pdo_pgsql zip sockets simplexml gmp \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -55,11 +56,11 @@ COPY ./docker/configs-data/php.ini /usr/local/etc/php/conf.d/custom-php.ini
 COPY .env.example .env
 
 ## Install dependencies AFTER copying source
-#RUN if [ "$APP_ENV" = "test" ]; then \
-#        composer update --no-interaction --prefer-dist --optimize-autoloader; \
-#    else \
-#        composer update --no-dev --no-interaction --prefer-dist --optimize-autoloader; \
-#    fi
+RUN if [ "$APP_ENV" = "production" ]; then \
+        composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader; \
+    else \
+        composer install --no-interaction --prefer-dist --optimize-autoloader; \
+    fi
 
 # Setup permissions
 RUN chown -R www-data:www-data /var/www \
@@ -69,3 +70,5 @@ RUN chown -R www-data:www-data /var/www \
 
 EXPOSE 9003
 EXPOSE 9000
+
+CMD ["php-fpm"]
