@@ -35,7 +35,8 @@ class FindArbitrageCommand extends Command
     public function handle(FindArbitrageUseCase $useCase): int
     {
         $minProfit = (float) $this->option('min-profit');
-        $top = $this->option('top') ? (int) $this->option('top') : null;
+        $topOption = $this->option('top');
+        $top = $topOption !== null ? (int) $topOption : null;
 
         // Validate min-profit
         if ($minProfit < 0) {

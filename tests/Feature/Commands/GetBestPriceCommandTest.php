@@ -59,6 +59,13 @@ class GetBestPriceCommandTest extends TestCase
      */
     public function test_invalid_pair_format(): void
     {
+        // Mock the use case (won't be called, but needed for DI resolution)
+        $mockUseCase = $this->createMock(GetBestPriceUseCase::class);
+        $mockUseCase->expects($this->never())->method('execute');
+
+        // Bind mock to container
+        $this->app->instance(GetBestPriceUseCase::class, $mockUseCase);
+
         // Test various invalid formats
         $invalidPairs = [
             'BTCUSDT',      // Missing slash

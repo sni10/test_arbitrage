@@ -199,6 +199,13 @@ class FindArbitrageCommandTest extends TestCase
      */
     public function test_invalid_min_profit_negative(): void
     {
+        // Mock the use case (won't be called, but needed for DI resolution)
+        $mockUseCase = $this->createMock(FindArbitrageUseCase::class);
+        $mockUseCase->expects($this->never())->method('execute');
+
+        // Bind mock to container
+        $this->app->instance(FindArbitrageUseCase::class, $mockUseCase);
+
         $this->artisan('arb:opportunities', ['--min-profit' => '-1'])
             ->expectsOutput('Invalid min-profit value. Must be >= 0')
             ->assertExitCode(1);
@@ -209,6 +216,13 @@ class FindArbitrageCommandTest extends TestCase
      */
     public function test_invalid_top_zero(): void
     {
+        // Mock the use case (won't be called, but needed for DI resolution)
+        $mockUseCase = $this->createMock(FindArbitrageUseCase::class);
+        $mockUseCase->expects($this->never())->method('execute');
+
+        // Bind mock to container
+        $this->app->instance(FindArbitrageUseCase::class, $mockUseCase);
+
         $this->artisan('arb:opportunities', ['--top' => '0'])
             ->expectsOutput('Invalid top value. Must be > 0')
             ->assertExitCode(1);
@@ -219,6 +233,13 @@ class FindArbitrageCommandTest extends TestCase
      */
     public function test_invalid_top_negative(): void
     {
+        // Mock the use case (won't be called, but needed for DI resolution)
+        $mockUseCase = $this->createMock(FindArbitrageUseCase::class);
+        $mockUseCase->expects($this->never())->method('execute');
+
+        // Bind mock to container
+        $this->app->instance(FindArbitrageUseCase::class, $mockUseCase);
+
         $this->artisan('arb:opportunities', ['--top' => '-5'])
             ->expectsOutput('Invalid top value. Must be > 0')
             ->assertExitCode(1);
