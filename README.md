@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](https://github.com/sni10/test_arbitrage/blob/main/LICENSE)
 [![Latest Release](https://img.shields.io/github/v/release/sni10/test_arbitrage?style=for-the-badge&logo=github)](https://github.com/sni10/test_arbitrage/releases/latest)
 [![Tests](https://img.shields.io/github/actions/workflow/status/sni10/test_arbitrage/tests.yml?style=for-the-badge&logo=github&label=Tests)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
-[![Coverage](https://img.shields.io/badge/coverage-96.77%25-brightgreen?style=for-the-badge&logo=codecov&logoColor=white)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/badge/coverage-85.4%25-brightgreen?style=for-the-badge&logo=codecov&logoColor=white)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
 
 # Arbitrage Analyzer
 

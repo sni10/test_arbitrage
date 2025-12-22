@@ -237,14 +237,15 @@ class FindArbitrageUseCaseTest extends TestCase
         $mock = $this->createMock(ExchangeConnectorInterface::class);
         $mock->method('getName')->willReturn($name);
 
-        $mock->method('fetchTicker')->willReturnCallback(function ($symbol) use ($name, $pairPrices) {
-            if (! isset($pairPrices[$symbol])) {
-                throw new \Exception("Symbol not found: {$symbol}");
-            }
-
+        $mock->method('fetchTickers')->willReturnCallback(function () use ($name, $pairPrices) {
+            $tickers = [];
             $timestamp = time() * 1000;
 
-            return new Ticker($symbol, $pairPrices[$symbol], $name, $timestamp);
+            foreach ($pairPrices as $symbol => $price) {
+                $tickers[] = new Ticker($symbol, $price, $name, $timestamp);
+            }
+
+            return $tickers;
         });
 
         return $mock;
@@ -258,18 +259,15 @@ class FindArbitrageUseCaseTest extends TestCase
         $mock = $this->createMock(ExchangeConnectorInterface::class);
         $mock->method('getName')->willReturn($name);
 
-        $mock->method('fetchTicker')->willReturnCallback(function ($symbol) use ($name, $successPairs, $failPairs) {
-            if (in_array($symbol, $failPairs)) {
-                throw new \Exception("Failed to fetch {$symbol}");
-            }
-
-            if (! isset($successPairs[$symbol])) {
-                throw new \Exception("Symbol not found: {$symbol}");
-            }
-
+        $mock->method('fetchTickers')->willReturnCallback(function () use ($name, $successPairs) {
+            $tickers = [];
             $timestamp = time() * 1000;
 
-            return new Ticker($symbol, $successPairs[$symbol], $name, $timestamp);
+            foreach ($successPairs as $symbol => $price) {
+                $tickers[] = new Ticker($symbol, $price, $name, $timestamp);
+            }
+
+            return $tickers;
         });
 
         return $mock;
