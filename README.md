@@ -1,3 +1,12 @@
+[![CI](https://img.shields.io/github/actions/workflow/status/sni10/test_arbitrage/tests.yml?style=for-the-badge&logo=github&label=CI)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
+[![Release](https://img.shields.io/github/actions/workflow/status/sni10/test_arbitrage/release.yml?style=for-the-badge&logo=github&label=Release)](https://github.com/sni10/test_arbitrage/actions/workflows/release.yml)
+[![PHP](https://img.shields.io/badge/PHP-8.4-blue?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/Laravel-11.x-red?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](https://github.com/sni10/test_arbitrage/blob/main/LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/sni10/test_arbitrage?style=for-the-badge&logo=github)](https://github.com/sni10/test_arbitrage/releases/latest)
+[![Tests](https://img.shields.io/github/actions/workflow/status/sni10/test_arbitrage/tests.yml?style=for-the-badge&logo=github&label=Tests)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/badge/coverage-96.77%25-brightgreen?style=for-the-badge&logo=codecov&logoColor=white)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
+
 # Arbitrage Analyzer
 
 Консольное приложение для анализа арбитражных возможностей на криптовалютных биржах.
@@ -16,7 +25,7 @@
 ## Требования
 
 - Docker & Docker Compose
-- PHP 8.2+ (в контейнере)
+- PHP 8.4 (в контейнере)
 - PostgreSQL 16 (в контейнере)
 - Redis 7.0 (в контейнере)
 
@@ -31,7 +40,7 @@ docker network create internal_sync_network
 ### 2. Запустить сервисы
 
 ```powershell
-$env:APP_ENV = "local"
+$env:APP_ENV = "test"
 docker compose up -d --build
 ```
 
