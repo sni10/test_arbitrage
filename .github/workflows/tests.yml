@@ -52,10 +52,6 @@ jobs:
         run: |
           docker compose up -d
 
-      - name: Install dependencies
-        run: |
-          docker compose exec -T php-arb composer install --no-interaction --prefer-dist --optimize-autoloader
-
       - name: Run tests
         run: |
           docker compose exec php-arb php artisan test
@@ -72,7 +68,8 @@ jobs:
       - name: Copy coverage reports from container
         if: always()
         run: |
-          docker compose cp php-arb:/var/www/arb/storage/coverage-report ./storage/
+          mkdir -p storage
+          docker compose exec -T php-arb tar -C /var/www/arb -cf - storage/coverage-report | tar -C . --no-same-owner -xf -
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4

@@ -43,24 +43,7 @@ docker network create internal_sync_network
 $env:APP_ENV = "test"
 docker compose up -d --build
 ```
-
-### 3. Установить зависимости
-
-```powershell
-docker compose exec -T php-arb composer install
-```
-
-### 4. Настроить приложение
-
-```powershell
-# Сгенерировать ключ приложения
-docker compose exec -T php-arb php artisan key:generate
-
-# Выполнить миграции
-docker compose exec -T php-arb php artisan migrate
-```
-
-### 5. Настроить .env (опционально)
+### 3. Настроить .env (опционально)
 
 Скопируйте `.env.example` в `.env` и настройте параметры:
 
