@@ -7,12 +7,8 @@ services:
                 APP_ENV: ${APP_ENV}
         environment:
             APP_ENV: ${APP_ENV}
-        volumes:
-            - ./:/var/www/arb
-        networks:
-          - internal_sync_network
-#        For prod
-#        command: composer run-script serve
+#        volumes:
+#            - ./:/var/www/arb
 
     postgres-arb:
       image: postgres:16
@@ -24,8 +20,6 @@ services:
         - postgres_data:/var/lib/postgresql/data
       ports:
         - "5432:5432"
-      networks:
-        - internal_sync_network
       healthcheck:
         test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}" ]
         interval: 10s
@@ -34,8 +28,6 @@ services:
 
     redis-arb:
       image: redis:7.0.7
-      networks:
-        - internal_sync_network
       volumes:
         - redis_data:/data
       ports:
@@ -44,9 +36,3 @@ services:
 volumes:
   postgres_data:
   redis_data:
-
-networks:
-  internal_sync_network:
-    driver: bridge
-    external: true
-    name: internal_sync_network
