@@ -3,7 +3,6 @@
 namespace Tests\Feature\Commands;
 
 use App\Application\UseCases\FindArbitrageUseCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -13,7 +12,6 @@ use Tests\TestCase;
  */
 class FindArbitrageCommandTest extends TestCase
 {
-    use RefreshDatabase;
 
     /**
      * Test successful command execution with default options.

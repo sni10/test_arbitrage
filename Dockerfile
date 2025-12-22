@@ -62,10 +62,6 @@ RUN if [ "$APP_ENV" = "production" ]; then \
         composer install --no-interaction --prefer-dist --optimize-autoloader; \
     fi
 
-# Entrypoint for app bootstrap (deps/key/migrations)
-COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 # Setup permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www \
