@@ -6,6 +6,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
+        "ccxt/ccxt": "^4.0",
         "php": "^8.2",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9"

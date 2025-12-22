@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     procps \
     libssh2-1-dev \
     net-tools \
+    libgmp-dev \
     lsof \
     libfreetype6-dev \
     apt-transport-https \
@@ -29,7 +30,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     rsync \
     supervisor \
-    && docker-php-ext-install mbstring exif pcntl bcmath gd pdo pdo_pgsql zip sockets simplexml \
+    && docker-php-ext-install mbstring exif pcntl bcmath gd pdo pdo_pgsql zip sockets simplexml gmp \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
