@@ -56,11 +56,11 @@ COPY ./docker/configs-data/php.ini /usr/local/etc/php/conf.d/custom-php.ini
 COPY .env.example .env
 
 ## Install dependencies AFTER copying source
-#RUN if [ "$APP_ENV" = "test" ]; then \
-#        composer update --no-interaction --prefer-dist --optimize-autoloader; \
-#    else \
-#        composer update --no-dev --no-interaction --prefer-dist --optimize-autoloader; \
-#    fi
+RUN if [ "$APP_ENV" = "test" ]; then \
+        composer update --no-interaction --prefer-dist --optimize-autoloader; \
+    else \
+        composer update --no-dev --no-interaction --prefer-dist --optimize-autoloader; \
+    fi
 
 # Setup permissions
 RUN chown -R www-data:www-data /var/www \

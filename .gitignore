@@ -42,3 +42,4 @@ test_auth_prod.php
 /docs/
 !/.env.example
 
+/.output.txt
