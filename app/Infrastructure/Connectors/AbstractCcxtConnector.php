@@ -5,6 +5,7 @@ namespace App\Infrastructure\Connectors;
 use App\Domain\Contracts\ExchangeConnectorInterface;
 use App\Domain\Entities\Ticker;
 use ccxt\Exchange;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Abstract base class for CCXT-based exchange connectors.
@@ -148,10 +149,14 @@ abstract class AbstractCcxtConnector implements ExchangeConnectorInterface
             } catch (\ccxt\NetworkError $e) {
                 $lastException = $e;
                 if ($attempt < $this->retryAttempts) {
+                    Log::warning("{$this->exchangeName} network error on attempt {$attempt}/{$this->retryAttempts}: {$e->getMessage()}");
                     usleep($this->retryDelay * 1000);
+                } else {
+                    Log::error("{$this->exchangeName} network error after {$this->retryAttempts} attempts: {$e->getMessage()}");
                 }
             } catch (\ccxt\ExchangeError $e) {
                 // Don't retry on exchange errors (invalid symbol, etc.)
+                Log::error("{$this->exchangeName} API error: {$e->getMessage()}");
                 throw new \Exception(
                     "{$this->exchangeName} API error: {$e->getMessage()}",
                     0,

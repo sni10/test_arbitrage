@@ -4,6 +4,7 @@ namespace App\Application\UseCases;
 
 use App\Application\Services\CommonPairsService;
 use App\Domain\Services\ArbitrageCalculator;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Use case for finding arbitrage opportunities across all exchanges.
@@ -95,6 +96,7 @@ class FindArbitrageUseCase
                     $tickers[] = $ticker;
                 } catch (\Exception $e) {
                     // Continue with other exchanges (graceful degradation)
+                    Log::warning("Failed to fetch ticker for {$pair} from {$exchange->getName()}: {$e->getMessage()}");
                 }
             }
 

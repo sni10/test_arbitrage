@@ -3,6 +3,7 @@
 namespace App\Application\UseCases;
 
 use App\Domain\Services\PriceAnalyzer;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Use case for finding the best price for a trading pair across all exchanges.
@@ -51,7 +52,9 @@ class GetBestPriceUseCase
                 $ticker = $exchange->fetchTicker($pair);
                 $tickers[] = $ticker;
             } catch (\Exception $e) {
-                $failedExchanges[] = $exchange->getName();
+                $exchangeName = $exchange->getName();
+                $failedExchanges[] = $exchangeName;
+                Log::warning("Failed to fetch ticker for {$pair} from {$exchangeName}: {$e->getMessage()}");
             }
         }
 

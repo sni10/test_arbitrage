@@ -3,6 +3,7 @@
 namespace App\Application\Services;
 
 use App\Infrastructure\Cache\LaravelCacheAdapter;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Service for finding common trading pairs across all exchanges.
@@ -62,7 +63,9 @@ class CommonPairsService
                 $pairs = $exchange->getAvailablePairs();
                 $pairsByExchange[$exchange->getName()] = $pairs;
             } catch (\Exception $e) {
-                $failedExchanges[] = $exchange->getName();
+                $exchangeName = $exchange->getName();
+                $failedExchanges[] = $exchangeName;
+                Log::warning("Failed to fetch available pairs from {$exchangeName}: {$e->getMessage()}");
             }
         }
 

@@ -6,6 +6,7 @@ use App\Domain\Contracts\ExchangeConnectorInterface;
 use App\Domain\Entities\Ticker;
 use App\Infrastructure\Factories\HttpClientFactory;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Log;
 
 /**
  * JBEX exchange connector using custom HTTP implementation.
@@ -181,6 +182,7 @@ class JbexConnector implements ExchangeConnectorInterface
         $response = $client->get($url, $params);
 
         if ($response->failed()) {
+            Log::error("JBEX API error: HTTP {$response->status()} for URL: {$url}");
             throw new \Exception("JBEX API error: HTTP {$response->status()}");
         }
 

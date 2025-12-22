@@ -5,6 +5,7 @@ namespace Tests\Unit\Application\Services;
 use App\Application\Services\CommonPairsService;
 use App\Domain\Contracts\ExchangeConnectorInterface;
 use App\Infrastructure\Cache\LaravelCacheAdapter;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\TestCase;
 
 class CommonPairsServiceTest extends TestCase
@@ -16,6 +17,10 @@ class CommonPairsServiceTest extends TestCase
     {
         parent::setUp();
         $this->cache = $this->createMock(LaravelCacheAdapter::class);
+
+        // Mock Log facade to prevent "facade root not set" errors
+        Log::shouldReceive('warning')->andReturnNull();
+        Log::shouldReceive('error')->andReturnNull();
     }
 
     public function test_returns_common_pairs_from_all_exchanges(): void

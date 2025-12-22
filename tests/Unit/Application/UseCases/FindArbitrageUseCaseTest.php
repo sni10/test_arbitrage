@@ -7,6 +7,7 @@ use App\Application\UseCases\FindArbitrageUseCase;
 use App\Domain\Contracts\ExchangeConnectorInterface;
 use App\Domain\Entities\Ticker;
 use App\Domain\Services\ArbitrageCalculator;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\TestCase;
 
 class FindArbitrageUseCaseTest extends TestCase
@@ -18,6 +19,10 @@ class FindArbitrageUseCaseTest extends TestCase
     {
         parent::setUp();
         $this->arbitrageCalculator = new ArbitrageCalculator();
+
+        // Mock Log facade to prevent "facade root not set" errors
+        Log::shouldReceive('warning')->andReturnNull();
+        Log::shouldReceive('error')->andReturnNull();
     }
 
     public function test_finds_arbitrage_opportunities(): void
