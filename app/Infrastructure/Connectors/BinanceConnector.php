@@ -19,7 +19,7 @@ class BinanceConnector extends AbstractCcxtConnector
     /**
      * Create Binance connector with injected CCXT exchange instance.
      *
-     * @param Exchange $exchange CCXT Binance exchange instance
+     * @param  Exchange  $exchange  CCXT Binance exchange instance
      */
     public function __construct(Exchange $exchange)
     {

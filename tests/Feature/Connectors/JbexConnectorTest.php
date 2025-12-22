@@ -35,7 +35,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl . '/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -59,7 +59,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl . '/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -84,7 +84,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl . '/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -112,7 +112,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl . '/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -140,7 +140,7 @@ class JbexConnectorTest extends TestCase
     public function test_fetch_ticker_throws_exception_when_price_missing(): void
     {
         Http::fake([
-            $this->baseUrl . '/openapi/quote/v1/ticker/price*' => Http::response([
+            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response([
                 'symbol' => 'BTCUSDT',
             ], 200),
         ]);
@@ -159,7 +159,7 @@ class JbexConnectorTest extends TestCase
     public function test_fetch_ticker_throws_exception_on_http_error(): void
     {
         Http::fake([
-            $this->baseUrl . '/openapi/quote/v1/ticker/price*' => Http::response([], 500),
+            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response([], 500),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -176,7 +176,7 @@ class JbexConnectorTest extends TestCase
     public function test_fetch_markets_throws_exception_on_invalid_response(): void
     {
         Http::fake([
-            $this->baseUrl . '/openapi/v1/brokerInfo*' => Http::response([
+            $this->baseUrl.'/openapi/v1/brokerInfo*' => Http::response([
                 'invalid' => 'data',
             ], 200),
         ]);
@@ -232,7 +232,7 @@ class JbexConnectorTest extends TestCase
         ];
 
         Http::fake([
-            $this->baseUrl . '/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -253,7 +253,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl . '/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');

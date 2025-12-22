@@ -19,7 +19,7 @@ class PoloniexConnector extends AbstractCcxtConnector
     /**
      * Create Poloniex connector with injected CCXT exchange instance.
      *
-     * @param Exchange $exchange CCXT Poloniex exchange instance
+     * @param  Exchange  $exchange  CCXT Poloniex exchange instance
      */
     public function __construct(Exchange $exchange)
     {

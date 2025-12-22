@@ -3,7 +3,6 @@
 namespace Tests\Feature\Commands;
 
 use App\Application\UseCases\FindArbitrageUseCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -13,7 +12,6 @@ use Tests\TestCase;
  */
 class FindArbitrageCommandTest extends TestCase
 {
-    use RefreshDatabase;
 
     /**
      * Test successful command execution with default options.
@@ -29,19 +27,19 @@ class FindArbitrageCommandTest extends TestCase
                 'opportunities' => [
                     [
                         'pair' => 'BTC/USDT',
-                        'buy_exchange' => 'Binance',
-                        'buy_price' => 45000.00,
-                        'sell_exchange' => 'Bybit',
-                        'sell_price' => 45500.00,
-                        'profit_percent' => 1.11,
+                        'buyExchange' => 'Binance',
+                        'buyPrice' => 45000.00,
+                        'sellExchange' => 'Bybit',
+                        'sellPrice' => 45500.00,
+                        'profitPercent' => 1.11,
                     ],
                     [
                         'pair' => 'ETH/USDT',
-                        'buy_exchange' => 'Poloniex',
-                        'buy_price' => 2500.00,
-                        'sell_exchange' => 'WhiteBIT',
-                        'sell_price' => 2520.00,
-                        'profit_percent' => 0.80,
+                        'buyExchange' => 'Poloniex',
+                        'buyPrice' => 2500.00,
+                        'sellExchange' => 'WhiteBIT',
+                        'sellPrice' => 2520.00,
+                        'profitPercent' => 0.80,
                     ],
                 ],
                 'total_found' => 2,
@@ -73,11 +71,11 @@ class FindArbitrageCommandTest extends TestCase
                 'opportunities' => [
                     [
                         'pair' => 'BTC/USDT',
-                        'buy_exchange' => 'Binance',
-                        'buy_price' => 45000.00,
-                        'sell_exchange' => 'Bybit',
-                        'sell_price' => 45500.00,
-                        'profit_percent' => 1.11,
+                        'buyExchange' => 'Binance',
+                        'buyPrice' => 45000.00,
+                        'sellExchange' => 'Bybit',
+                        'sellPrice' => 45500.00,
+                        'profitPercent' => 1.11,
                     ],
                 ],
                 'total_found' => 1,
@@ -108,11 +106,11 @@ class FindArbitrageCommandTest extends TestCase
                 'opportunities' => [
                     [
                         'pair' => 'BTC/USDT',
-                        'buy_exchange' => 'Binance',
-                        'buy_price' => 45000.00,
-                        'sell_exchange' => 'Bybit',
-                        'sell_price' => 45500.00,
-                        'profit_percent' => 1.11,
+                        'buyExchange' => 'Binance',
+                        'buyPrice' => 45000.00,
+                        'sellExchange' => 'Bybit',
+                        'sellPrice' => 45500.00,
+                        'profitPercent' => 1.11,
                     ],
                 ],
                 'total_found' => 1,
@@ -143,11 +141,11 @@ class FindArbitrageCommandTest extends TestCase
                 'opportunities' => [
                     [
                         'pair' => 'BTC/USDT',
-                        'buy_exchange' => 'Binance',
-                        'buy_price' => 45000.00,
-                        'sell_exchange' => 'Bybit',
-                        'sell_price' => 45900.00,
-                        'profit_percent' => 2.00,
+                        'buyExchange' => 'Binance',
+                        'buyPrice' => 45000.00,
+                        'sellExchange' => 'Bybit',
+                        'sellPrice' => 45900.00,
+                        'profitPercent' => 2.00,
                     ],
                 ],
                 'total_found' => 1,
@@ -280,27 +278,27 @@ class FindArbitrageCommandTest extends TestCase
                 'opportunities' => [
                     [
                         'pair' => 'BTC/USDT',
-                        'buy_exchange' => 'Binance',
-                        'buy_price' => 45000.12345678,
-                        'sell_exchange' => 'Bybit',
-                        'sell_price' => 45500.87654321,
-                        'profit_percent' => 1.1134,
+                        'buyExchange' => 'Binance',
+                        'buyPrice' => 45000.12345678,
+                        'sellExchange' => 'Bybit',
+                        'sellPrice' => 45500.87654321,
+                        'profitPercent' => 1.1134,
                     ],
                     [
                         'pair' => 'ETH/USDT',
-                        'buy_exchange' => 'Poloniex',
-                        'buy_price' => 2500.00,
-                        'sell_exchange' => 'WhiteBIT',
-                        'sell_price' => 2520.00,
-                        'profit_percent' => 0.80,
+                        'buyExchange' => 'Poloniex',
+                        'buyPrice' => 2500.00,
+                        'sellExchange' => 'WhiteBIT',
+                        'sellPrice' => 2520.00,
+                        'profitPercent' => 0.80,
                     ],
                     [
                         'pair' => 'DOGE/USDT',
-                        'buy_exchange' => 'JBEX',
-                        'buy_price' => 0.12345678,
-                        'sell_exchange' => 'Binance',
-                        'sell_price' => 0.12456789,
-                        'profit_percent' => 0.90,
+                        'buyExchange' => 'JBEX',
+                        'buyPrice' => 0.12345678,
+                        'sellExchange' => 'Binance',
+                        'sellPrice' => 0.12456789,
+                        'profitPercent' => 0.90,
                     ],
                 ],
                 'total_found' => 3,

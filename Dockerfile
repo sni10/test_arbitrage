@@ -56,10 +56,10 @@ COPY ./docker/configs-data/php.ini /usr/local/etc/php/conf.d/custom-php.ini
 COPY .env.example .env
 
 ## Install dependencies AFTER copying source
-RUN if [ "$APP_ENV" = "test" ]; then \
-        composer update --no-interaction --prefer-dist --optimize-autoloader; \
+RUN if [ "$APP_ENV" = "production" ]; then \
+        composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader; \
     else \
-        composer update --no-dev --no-interaction --prefer-dist --optimize-autoloader; \
+        composer install --no-interaction --prefer-dist --optimize-autoloader; \
     fi
 
 # Setup permissions
@@ -70,3 +70,5 @@ RUN chown -R www-data:www-data /var/www \
 
 EXPOSE 9003
 EXPOSE 9000
+
+CMD ["php-fpm"]

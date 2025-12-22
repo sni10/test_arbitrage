@@ -3,6 +3,7 @@
 namespace App\Application\UseCases;
 
 use App\Domain\Services\PriceAnalyzer;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Use case for finding the best price for a trading pair across all exchanges.
@@ -13,19 +14,18 @@ use App\Domain\Services\PriceAnalyzer;
 class GetBestPriceUseCase
 {
     /**
-     * @param array $exchanges Array of ExchangeConnectorInterface instances
-     * @param PriceAnalyzer $priceAnalyzer Domain service for price analysis
+     * @param  array  $exchanges  Array of ExchangeConnectorInterface instances
+     * @param  PriceAnalyzer  $priceAnalyzer  Domain service for price analysis
      */
     public function __construct(
         private array $exchanges,
         private PriceAnalyzer $priceAnalyzer
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the use case to find best prices for a trading pair.
      *
-     * @param string $pair Trading pair in BASE/QUOTE format (e.g., 'BTC/USDT')
+     * @param  string  $pair  Trading pair in BASE/QUOTE format (e.g., 'BTC/USDT')
      * @return array{
      *     pair: string,
      *     min: array{exchange: string, price: float, timestamp: int},
@@ -34,6 +34,7 @@ class GetBestPriceUseCase
      *     exchanges_checked: int,
      *     exchanges_failed: array<string>
      * }
+     *
      * @throws \Exception If no exchanges are available or pair is not found on any exchange
      */
     public function execute(string $pair): array
@@ -51,15 +52,17 @@ class GetBestPriceUseCase
                 $ticker = $exchange->fetchTicker($pair);
                 $tickers[] = $ticker;
             } catch (\Exception $e) {
-                $failedExchanges[] = $exchange->getName();
+                $exchangeName = $exchange->getName();
+                $failedExchanges[] = $exchangeName;
+                Log::warning("Failed to fetch ticker for {$pair} from {$exchangeName}: {$e->getMessage()}");
             }
         }
 
         // Check if we have any tickers
         if (empty($tickers)) {
             $message = "Trading pair '{$pair}' not found on any exchange";
-            if (!empty($failedExchanges)) {
-                $message .= '. Failed exchanges: ' . implode(', ', $failedExchanges);
+            if (! empty($failedExchanges)) {
+                $message .= '. Failed exchanges: '.implode(', ', $failedExchanges);
             }
             throw new \Exception($message);
         }

@@ -18,9 +18,10 @@ class ArbitrageCalculator
      *
      * Formula: ((sellPrice - buyPrice) / buyPrice) * 100
      *
-     * @param float $buyPrice Price to buy at (lower price)
-     * @param float $sellPrice Price to sell at (higher price)
+     * @param  float  $buyPrice  Price to buy at (lower price)
+     * @param  float  $sellPrice  Price to sell at (higher price)
      * @return float Profit percentage
+     *
      * @throws \InvalidArgumentException If buy price is zero or negative
      */
     public function calculateProfit(float $buyPrice, float $sellPrice): float
@@ -35,8 +36,8 @@ class ArbitrageCalculator
     /**
      * Find arbitrage opportunities from tickers grouped by trading pair.
      *
-     * @param array<string, array<Ticker>> $tickersByPair Tickers grouped by pair symbol
-     * @param float $minProfit Minimum profit percentage threshold (default: 0.1)
+     * @param  array<string, array<Ticker>>  $tickersByPair  Tickers grouped by pair symbol
+     * @param  float  $minProfit  Minimum profit percentage threshold (default: 0.1)
      * @return array<ArbitrageOpportunity> Array of arbitrage opportunities sorted by profit (descending)
      */
     public function findOpportunities(array $tickersByPair, float $minProfit = 0.1): array
@@ -52,7 +53,7 @@ class ArbitrageCalculator
             $maxTicker = null;
 
             foreach ($tickers as $ticker) {
-                if (!$ticker instanceof Ticker) {
+                if (! $ticker instanceof Ticker) {
                     continue;
                 }
 
@@ -87,7 +88,7 @@ class ArbitrageCalculator
             }
         }
 
-        usort($opportunities, fn($a, $b) => $b->profitPercent <=> $a->profitPercent);
+        usort($opportunities, fn ($a, $b) => $b->profitPercent <=> $a->profitPercent);
 
         return $opportunities;
     }

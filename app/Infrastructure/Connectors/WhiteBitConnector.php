@@ -19,7 +19,7 @@ class WhiteBitConnector extends AbstractCcxtConnector
     /**
      * Create WhiteBIT connector with injected CCXT exchange instance.
      *
-     * @param Exchange $exchange CCXT WhiteBIT exchange instance
+     * @param  Exchange  $exchange  CCXT WhiteBIT exchange instance
      */
     public function __construct(Exchange $exchange)
     {

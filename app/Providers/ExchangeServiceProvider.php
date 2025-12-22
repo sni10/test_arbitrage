@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Application\UseCases\FindArbitrageUseCase;
+use App\Application\UseCases\GetBestPriceUseCase;
 use App\Infrastructure\Connectors\BinanceConnector;
 use App\Infrastructure\Connectors\BybitConnector;
 use App\Infrastructure\Connectors\JbexConnector;
@@ -32,24 +34,28 @@ class ExchangeServiceProvider extends ServiceProvider
         $this->app->singleton('exchange.binance', function ($app) {
             $factory = $app->make(CcxtClientFactory::class);
             $exchange = $factory->createBinance();
+
             return new BinanceConnector($exchange);
         });
 
         $this->app->singleton('exchange.poloniex', function ($app) {
             $factory = $app->make(CcxtClientFactory::class);
             $exchange = $factory->createPoloniex();
+
             return new PoloniexConnector($exchange);
         });
 
         $this->app->singleton('exchange.bybit', function ($app) {
             $factory = $app->make(CcxtClientFactory::class);
             $exchange = $factory->createBybit();
+
             return new BybitConnector($exchange);
         });
 
         $this->app->singleton('exchange.whitebit', function ($app) {
             $factory = $app->make(CcxtClientFactory::class);
             $exchange = $factory->createWhitebit();
+
             return new WhiteBitConnector($exchange);
         });
 
@@ -57,6 +63,7 @@ class ExchangeServiceProvider extends ServiceProvider
         $this->app->singleton('exchange.jbex', function ($app) {
             $httpFactory = $app->make(HttpClientFactory::class);
             $config = config('exchanges.jbex');
+
             return new JbexConnector($httpFactory, $config);
         });
 
@@ -72,6 +79,22 @@ class ExchangeServiceProvider extends ServiceProvider
             }
 
             return $exchanges;
+        });
+
+        // Register use cases with explicit dependency injection
+        $this->app->singleton(GetBestPriceUseCase::class, function ($app) {
+            return new GetBestPriceUseCase(
+                exchanges: array_values($app->make('exchanges')),
+                priceAnalyzer: $app->make(\App\Domain\Services\PriceAnalyzer::class)
+            );
+        });
+
+        $this->app->singleton(FindArbitrageUseCase::class, function ($app) {
+            return new FindArbitrageUseCase(
+                exchanges: array_values($app->make('exchanges')),
+                commonPairsService: $app->make(\App\Application\Services\CommonPairsService::class),
+                arbitrageCalculator: $app->make(\App\Domain\Services\ArbitrageCalculator::class)
+            );
         });
     }
 

@@ -11,29 +11,28 @@ namespace App\Domain\Entities;
 readonly class Ticker
 {
     /**
-     * @param string $symbol Trading pair in BASE/QUOTE format (e.g., 'BTC/USDT')
-     * @param float $price Current price
-     * @param string $exchange Exchange name (e.g., 'Binance', 'JBEX')
-     * @param int $timestamp Unix timestamp in milliseconds
+     * @param  string  $symbol  Trading pair in BASE/QUOTE format (e.g., 'BTC/USDT')
+     * @param  float  $price  Current price
+     * @param  string  $exchange  Exchange name (e.g., 'Binance', 'JBEX')
+     * @param  int  $timestamp  Unix timestamp in milliseconds
      */
     public function __construct(
         public string $symbol,
         public float $price,
         public string $exchange,
         public int $timestamp
-    ) {
-    }
+    ) {}
 
     /**
      * Create Ticker from array data.
      *
-     * @param array $data Associative array with keys: symbol, price, exchange, timestamp
-     * @return self
+     * @param  array  $data  Associative array with keys: symbol, price, exchange, timestamp
+     *
      * @throws \InvalidArgumentException If required fields are missing
      */
     public static function fromArray(array $data): self
     {
-        if (!isset($data['symbol'], $data['price'], $data['exchange'], $data['timestamp'])) {
+        if (! isset($data['symbol'], $data['price'], $data['exchange'], $data['timestamp'])) {
             throw new \InvalidArgumentException('Missing required fields for Ticker');
         }
 

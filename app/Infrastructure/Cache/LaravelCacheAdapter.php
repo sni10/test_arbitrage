@@ -15,9 +15,8 @@ class LaravelCacheAdapter
     /**
      * Retrieve an item from the cache.
      *
-     * @param string $key Cache key
-     * @param mixed $default Default value if key doesn't exist
-     * @return mixed
+     * @param  string  $key  Cache key
+     * @param  mixed  $default  Default value if key doesn't exist
      */
     public function get(string $key, mixed $default = null): mixed
     {
@@ -27,10 +26,9 @@ class LaravelCacheAdapter
     /**
      * Store an item in the cache.
      *
-     * @param string $key Cache key
-     * @param mixed $value Value to store
-     * @param int|null $ttl Time to live in seconds (null = forever)
-     * @return bool
+     * @param  string  $key  Cache key
+     * @param  mixed  $value  Value to store
+     * @param  int|null  $ttl  Time to live in seconds (null = forever)
      */
     public function put(string $key, mixed $value, ?int $ttl = null): bool
     {
@@ -44,10 +42,9 @@ class LaravelCacheAdapter
     /**
      * Get an item from the cache, or execute the given Closure and store the result.
      *
-     * @param string $key Cache key
-     * @param int $ttl Time to live in seconds
-     * @param \Closure $callback Callback to execute if key doesn't exist
-     * @return mixed
+     * @param  string  $key  Cache key
+     * @param  int  $ttl  Time to live in seconds
+     * @param  \Closure  $callback  Callback to execute if key doesn't exist
      */
     public function remember(string $key, int $ttl, \Closure $callback): mixed
     {
@@ -57,8 +54,7 @@ class LaravelCacheAdapter
     /**
      * Determine if an item exists in the cache.
      *
-     * @param string $key Cache key
-     * @return bool
+     * @param  string  $key  Cache key
      */
     public function has(string $key): bool
     {
@@ -68,8 +64,7 @@ class LaravelCacheAdapter
     /**
      * Remove an item from the cache.
      *
-     * @param string $key Cache key
-     * @return bool
+     * @param  string  $key  Cache key
      */
     public function forget(string $key): bool
     {
@@ -78,8 +73,6 @@ class LaravelCacheAdapter
 
     /**
      * Remove all items from the cache.
-     *
-     * @return bool
      */
     public function flush(): bool
     {
@@ -89,8 +82,8 @@ class LaravelCacheAdapter
     /**
      * Increment the value of an item in the cache.
      *
-     * @param string $key Cache key
-     * @param int $value Amount to increment by
+     * @param  string  $key  Cache key
+     * @param  int  $value  Amount to increment by
      * @return int|bool New value or false on failure
      */
     public function increment(string $key, int $value = 1): int|bool
@@ -101,8 +94,8 @@ class LaravelCacheAdapter
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param string $key Cache key
-     * @param int $value Amount to decrement by
+     * @param  string  $key  Cache key
+     * @param  int  $value  Amount to decrement by
      * @return int|bool New value or false on failure
      */
     public function decrement(string $key, int $value = 1): int|bool

@@ -4,6 +4,7 @@ namespace App\Application\UseCases;
 
 use App\Application\Services\CommonPairsService;
 use App\Domain\Services\ArbitrageCalculator;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Use case for finding arbitrage opportunities across all exchanges.
@@ -14,22 +15,21 @@ use App\Domain\Services\ArbitrageCalculator;
 class FindArbitrageUseCase
 {
     /**
-     * @param array $exchanges Array of ExchangeConnectorInterface instances
-     * @param CommonPairsService $commonPairsService Service for getting common pairs
-     * @param ArbitrageCalculator $arbitrageCalculator Domain service for arbitrage calculations
+     * @param  array  $exchanges  Array of ExchangeConnectorInterface instances
+     * @param  CommonPairsService  $commonPairsService  Service for getting common pairs
+     * @param  ArbitrageCalculator  $arbitrageCalculator  Domain service for arbitrage calculations
      */
     public function __construct(
         private array $exchanges,
         private CommonPairsService $commonPairsService,
         private ArbitrageCalculator $arbitrageCalculator
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the use case to find arbitrage opportunities.
      *
-     * @param float $minProfit Minimum profit percentage threshold (default: 0.1)
-     * @param int|null $top Limit results to top N opportunities (null = all)
+     * @param  float  $minProfit  Minimum profit percentage threshold (default: 0.1)
+     * @param  int|null  $top  Limit results to top N opportunities (null = all)
      * @return array{
      *     opportunities: array<array>,
      *     total_found: int,
@@ -37,6 +37,7 @@ class FindArbitrageUseCase
      *     min_profit_filter: float,
      *     top_filter: int|null
      * }
+     *
      * @throws \Exception If no exchanges are available or no common pairs found
      */
     public function execute(float $minProfit = 0.1, ?int $top = null): array
@@ -48,8 +49,8 @@ class FindArbitrageUseCase
         // Get common pairs (cached)
         $commonPairs = $this->commonPairsService->getCommonPairs();
 
-        // Fetch tickers for all common pairs from all exchanges
-        $tickersByPair = $this->fetchTickersForPairs($commonPairs);
+        // Fetch all tickers once per exchange, then filter to common pairs
+        $tickersByPair = $this->fetchTickersForCommonPairs($commonPairs);
 
         // Find arbitrage opportunities using domain service
         $opportunities = $this->arbitrageCalculator->findOpportunities($tickersByPair, $minProfit);
@@ -61,7 +62,7 @@ class FindArbitrageUseCase
 
         // Convert opportunities to array format
         $opportunitiesArray = array_map(
-            fn($opp) => $opp->toArray(),
+            fn ($opp) => $opp->toArray(),
             $opportunities
         );
 
@@ -79,28 +80,40 @@ class FindArbitrageUseCase
      *
      * Implements graceful degradation - continues if some exchanges fail.
      *
-     * @param array<string> $pairs Array of trading pair symbols
+     * @param  array<string>  $pairs  Array of trading pair symbols
      * @return array<string, array<Ticker>> Tickers grouped by pair symbol
      */
-    private function fetchTickersForPairs(array $pairs): array
+    private function fetchTickersForCommonPairs(array $pairs): array
     {
+        if (empty($pairs)) {
+            return [];
+        }
+
+        $pairsLookup = array_fill_keys($pairs, true);
         $tickersByPair = [];
 
-        foreach ($pairs as $pair) {
-            $tickers = [];
-
-            foreach ($this->exchanges as $exchange) {
-                try {
-                    $ticker = $exchange->fetchTicker($pair);
-                    $tickers[] = $ticker;
-                } catch (\Exception $e) {
-                    // Continue with other exchanges (graceful degradation)
-                }
+        foreach ($this->exchanges as $exchange) {
+            try {
+                $exchangeTickers = $exchange->fetchTickers();
+            } catch (\Exception $e) {
+                // Continue with other exchanges (graceful degradation)
+                Log::warning("Failed to fetch tickers from {$exchange->getName()}: {$e->getMessage()}");
+                continue;
             }
 
+            foreach ($exchangeTickers as $ticker) {
+                if (! isset($pairsLookup[$ticker->symbol])) {
+                    continue;
+                }
+
+                $tickersByPair[$ticker->symbol][] = $ticker;
+            }
+        }
+
+        foreach ($tickersByPair as $pair => $tickers) {
             // Only include pairs with at least 2 tickers (needed for arbitrage)
-            if (count($tickers) >= 2) {
-                $tickersByPair[$pair] = $tickers;
+            if (count($tickers) < 2) {
+                unset($tickersByPair[$pair]);
             }
         }
 

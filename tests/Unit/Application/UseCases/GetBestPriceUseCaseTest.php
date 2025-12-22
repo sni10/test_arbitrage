@@ -6,6 +6,7 @@ use App\Application\UseCases\GetBestPriceUseCase;
 use App\Domain\Contracts\ExchangeConnectorInterface;
 use App\Domain\Entities\Ticker;
 use App\Domain\Services\PriceAnalyzer;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\TestCase;
 
 class GetBestPriceUseCaseTest extends TestCase
@@ -15,7 +16,11 @@ class GetBestPriceUseCaseTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->priceAnalyzer = new PriceAnalyzer();
+        $this->priceAnalyzer = new PriceAnalyzer;
+
+        // Mock Log facade to prevent "facade root not set" errors
+        Log::shouldReceive('warning')->andReturnNull();
+        Log::shouldReceive('error')->andReturnNull();
     }
 
     public function test_returns_best_prices_for_pair(): void

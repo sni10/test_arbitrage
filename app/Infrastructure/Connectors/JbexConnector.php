@@ -6,6 +6,7 @@ use App\Domain\Contracts\ExchangeConnectorInterface;
 use App\Domain\Entities\Ticker;
 use App\Infrastructure\Factories\HttpClientFactory;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Log;
 
 /**
  * JBEX exchange connector using custom HTTP implementation.
@@ -22,15 +23,18 @@ use Illuminate\Http\Client\Response;
 class JbexConnector implements ExchangeConnectorInterface
 {
     private string $baseUrl;
+
     private array $endpoints;
+
     private ?array $marketsCache = null;
+
     private HttpClientFactory $httpFactory;
 
     /**
      * Initialize JBEX connector with injected HTTP client factory.
      *
-     * @param HttpClientFactory $httpFactory HTTP client factory
-     * @param array $config Exchange configuration from config/exchanges.php
+     * @param  HttpClientFactory  $httpFactory  HTTP client factory
+     * @param  array  $config  Exchange configuration from config/exchanges.php
      */
     public function __construct(HttpClientFactory $httpFactory, array $config)
     {
@@ -45,12 +49,12 @@ class JbexConnector implements ExchangeConnectorInterface
     public function fetchTicker(string $symbol): Ticker
     {
         $jbexSymbol = $this->denormalizeSymbol($symbol);
-        $url = $this->baseUrl . $this->endpoints['ticker_price'];
+        $url = $this->baseUrl.$this->endpoints['ticker_price'];
 
         $data = $this->executeHttpRequest($url, ['symbol' => $jbexSymbol]);
 
         // JBEX ticker/price returns: {"symbol": "BTCUSDT", "price": "42150.50"}
-        if (!isset($data['price'])) {
+        if (! isset($data['price'])) {
             throw new \Exception("JBEX: No price data available for {$symbol}");
         }
 
@@ -67,13 +71,13 @@ class JbexConnector implements ExchangeConnectorInterface
      */
     public function fetchTickers(): array
     {
-        $url = $this->baseUrl . $this->endpoints['ticker_price'];
+        $url = $this->baseUrl.$this->endpoints['ticker_price'];
         $data = $this->executeHttpRequest($url);
         $tickers = [];
 
         // JBEX returns array of tickers when no symbol specified
         foreach ($data as $tickerData) {
-            if (!isset($tickerData['symbol']) || !isset($tickerData['price'])) {
+            if (! isset($tickerData['symbol']) || ! isset($tickerData['price'])) {
                 continue;
             }
 
@@ -99,17 +103,17 @@ class JbexConnector implements ExchangeConnectorInterface
             return $this->marketsCache;
         }
 
-        $url = $this->baseUrl . $this->endpoints['broker_info'];
+        $url = $this->baseUrl.$this->endpoints['broker_info'];
         $data = $this->executeHttpRequest($url);
         $markets = [];
 
         // JBEX brokerInfo returns: {"symbols": [...]}
-        if (!isset($data['symbols']) || !is_array($data['symbols'])) {
-            throw new \Exception("JBEX: Invalid brokerInfo response format");
+        if (! isset($data['symbols']) || ! is_array($data['symbols'])) {
+            throw new \Exception('JBEX: Invalid brokerInfo response format');
         }
 
         foreach ($data['symbols'] as $marketData) {
-            if (!isset($marketData['symbol'])) {
+            if (! isset($marketData['symbol'])) {
                 continue;
             }
 
@@ -137,6 +141,7 @@ class JbexConnector implements ExchangeConnectorInterface
         }
 
         $this->marketsCache = $markets;
+
         return $markets;
     }
 
@@ -170,9 +175,10 @@ class JbexConnector implements ExchangeConnectorInterface
      *
      * Centralizes HTTP logic with retry, timeout, and error handling.
      *
-     * @param string $url Full URL to request
-     * @param array $params Query parameters
+     * @param  string  $url  Full URL to request
+     * @param  array  $params  Query parameters
      * @return array Response data as array
+     *
      * @throws \Exception If request fails
      */
     private function executeHttpRequest(string $url, array $params = []): array
@@ -181,6 +187,7 @@ class JbexConnector implements ExchangeConnectorInterface
         $response = $client->get($url, $params);
 
         if ($response->failed()) {
+            Log::error("JBEX API error: HTTP {$response->status()} for URL: {$url}");
             throw new \Exception("JBEX API error: HTTP {$response->status()}");
         }
 
@@ -192,7 +199,7 @@ class JbexConnector implements ExchangeConnectorInterface
      *
      * Converts BTCUSDT -> BTC/USDT
      *
-     * @param string $symbol JBEX symbol (e.g., 'BTCUSDT')
+     * @param  string  $symbol  JBEX symbol (e.g., 'BTCUSDT')
      * @return string Normalized symbol (e.g., 'BTC/USDT')
      */
     private function normalizeSymbol(string $symbol): string
@@ -203,8 +210,8 @@ class JbexConnector implements ExchangeConnectorInterface
         foreach ($quotes as $quote) {
             if (str_ends_with($symbol, $quote)) {
                 $base = substr($symbol, 0, -strlen($quote));
-                if (!empty($base)) {
-                    return $base . '/' . $quote;
+                if (! empty($base)) {
+                    return $base.'/'.$quote;
                 }
             }
         }
@@ -218,7 +225,7 @@ class JbexConnector implements ExchangeConnectorInterface
      *
      * Converts BTC/USDT -> BTCUSDT
      *
-     * @param string $symbol Normalized symbol (e.g., 'BTC/USDT')
+     * @param  string  $symbol  Normalized symbol (e.g., 'BTC/USDT')
      * @return string JBEX symbol (e.g., 'BTCUSDT')
      */
     private function denormalizeSymbol(string $symbol): string

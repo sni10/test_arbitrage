@@ -35,9 +35,10 @@ class GetBestPriceCommand extends Command
         $pair = $this->argument('pair');
 
         // Validate pair format
-        if (!$this->isValidPairFormat($pair)) {
+        if (! $this->isValidPairFormat($pair)) {
             $this->error("Invalid pair format: '{$pair}'");
             $this->info('Expected format: BASE/QUOTE (e.g., BTC/USDT, ETH/BTC)');
+
             return Command::FAILURE;
         }
 
@@ -49,7 +50,8 @@ class GetBestPriceCommand extends Command
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('Error: ' . $e->getMessage());
+            $this->error('Error: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -57,7 +59,7 @@ class GetBestPriceCommand extends Command
     /**
      * Validate trading pair format (BASE/QUOTE).
      *
-     * @param string $pair Trading pair to validate
+     * @param  string  $pair  Trading pair to validate
      * @return bool True if format is valid
      */
     private function isValidPairFormat(string $pair): bool
@@ -70,45 +72,45 @@ class GetBestPriceCommand extends Command
     /**
      * Display formatted result to the console.
      *
-     * @param array $result Result from GetBestPriceUseCase
+     * @param  array  $result  Result from GetBestPriceUseCase
      */
     private function displayResult(array $result): void
     {
         $this->newLine();
-        $this->line("═══════════════════════════════════════════════════════");
+        $this->line('═══════════════════════════════════════════════════════');
         $this->line("  Best Prices for <fg=cyan>{$result['pair']}</>");
-        $this->line("═══════════════════════════════════════════════════════");
+        $this->line('═══════════════════════════════════════════════════════');
         $this->newLine();
 
         // Min price
-        $this->line("<fg=green>Lowest Price:</>");
+        $this->line('<fg=green>Lowest Price:</>');
         $this->line("  Exchange:  <fg=yellow>{$result['min']['exchange']}</>");
         $this->line("  Price:     <fg=white>{$result['min']['price']}</>");
-        $this->line("  Time:      " . date('Y-m-d H:i:s', $result['min']['timestamp']));
+        $this->line('  Time:      '.date('Y-m-d H:i:s', $result['min']['timestamp']));
         $this->newLine();
 
         // Max price
-        $this->line("<fg=red>Highest Price:</>");
+        $this->line('<fg=red>Highest Price:</>');
         $this->line("  Exchange:  <fg=yellow>{$result['max']['exchange']}</>");
         $this->line("  Price:     <fg=white>{$result['max']['price']}</>");
-        $this->line("  Time:      " . date('Y-m-d H:i:s', $result['max']['timestamp']));
+        $this->line('  Time:      '.date('Y-m-d H:i:s', $result['max']['timestamp']));
         $this->newLine();
 
         // Difference
-        $this->line("<fg=magenta>Price Difference:</>");
+        $this->line('<fg=magenta>Price Difference:</>');
         $this->line("  Absolute:  <fg=white>{$result['difference']['absolute']}</>");
         $this->line("  Percent:   <fg=white>{$result['difference']['percent']}%</>");
         $this->newLine();
 
         // Statistics
-        $this->line("<fg=blue>Statistics:</>");
+        $this->line('<fg=blue>Statistics:</>');
         $this->line("  Exchanges checked: {$result['exchanges_checked']}");
 
-        if (!empty($result['exchanges_failed'])) {
-            $this->line("  <fg=yellow>Failed exchanges: " . implode(', ', $result['exchanges_failed']) . "</>");
+        if (! empty($result['exchanges_failed'])) {
+            $this->line('  <fg=yellow>Failed exchanges: '.implode(', ', $result['exchanges_failed']).'</>');
         }
 
-        $this->line("═══════════════════════════════════════════════════════");
+        $this->line('═══════════════════════════════════════════════════════');
         $this->newLine();
     }
 }
