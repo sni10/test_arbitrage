@@ -71,5 +71,4 @@ RUN chown -R www-data:www-data /var/www \
 EXPOSE 9003
 EXPOSE 9000
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
