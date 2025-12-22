@@ -50,7 +50,7 @@ jobs:
 
       - name: Start containers
         run: |
-          docker compose -f docker-compose.yml -f docker/config-envs/${APP_ENV}/docker-compose.override.yml up -d
+          docker compose up -d
 
       - name: Run tests
         run: |
