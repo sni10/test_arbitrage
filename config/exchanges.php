@@ -21,17 +21,17 @@ return [
 
     'jbex' => [
         'name' => 'JBEX',
-        'api_url' => env('JBEX_API_URL', 'https://api.jbex.com'),
+        'api_url' => env('JBEX_API_URL', 'https://api.jucoin.com'),
         'api_key' => env('JBEX_API_KEY', ''),
         'enabled' => env('JBEX_ENABLED', true),
         'type' => 'custom',
         'endpoints' => [
-            'broker_info' => '/openapi/v1/brokerInfo',
-            'ticker_price' => '/openapi/quote/v1/ticker/price',
-            'book_ticker' => '/openapi/quote/v1/ticker/bookTicker',
-            'depth' => '/openapi/quote/v1/depth',
-            'trades' => '/openapi/quote/v1/trades',
-            'klines' => '/openapi/quote/v1/klines',
+            'broker_info' => '/v1/spot/public/symbol',
+            'ticker_price' => '/v1/spot/public/ticker/price',
+            'book_ticker' => '/v1/spot/public/ticker/book',
+            'depth' => '/v1/spot/public/depth',
+            'trades' => '/v1/spot/public/trade/recent',
+            'klines' => '/v1/spot/public/kline',
         ],
     ],
 

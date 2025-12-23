@@ -53,7 +53,7 @@ class HttpClientFactory
         $headers = [];
 
         if (! empty($apiKey)) {
-            $headers['X-BH-APIKEY'] = $apiKey;
+            $headers['validate-appkey'] = $apiKey;
         }
 
         return $this->create($headers);

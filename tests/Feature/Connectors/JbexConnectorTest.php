@@ -16,7 +16,7 @@ use Tests\TestCase;
  */
 class JbexConnectorTest extends TestCase
 {
-    private string $baseUrl = 'https://api.jbex.com';
+    private string $baseUrl = 'https://api.jucoin.com';
 
     protected function setUp(): void
     {
@@ -35,7 +35,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/v1/spot/public/ticker/price*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -45,7 +45,7 @@ class JbexConnectorTest extends TestCase
         $this->assertSame('BTC/USDT', $ticker->symbol);
         $this->assertSame(42150.50, $ticker->price);
         $this->assertSame('JBEX', $ticker->exchange);
-        $this->assertIsInt($ticker->timestamp);
+        $this->assertSame(1700000000000, $ticker->timestamp);
     }
 
     /**
@@ -59,7 +59,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/v1/spot/public/ticker/price*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -84,7 +84,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl.'/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/v1/spot/public/symbol*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -112,14 +112,14 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl.'/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/v1/spot/public/symbol*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
         $pairs = $connector->getAvailablePairs();
 
         $this->assertIsArray($pairs);
-        $this->assertCount(2, $pairs); // Only BTC/USDT and ETH/USDT (SOL/USDT is HALT)
+        $this->assertCount(2, $pairs); // Only BTC/USDT and ETH/USDT (SOL/USDT is OFFLINE)
         $this->assertContains('BTC/USDT', $pairs);
         $this->assertContains('ETH/USDT', $pairs);
         $this->assertNotContains('SOL/USDT', $pairs);
@@ -140,8 +140,13 @@ class JbexConnectorTest extends TestCase
     public function test_fetch_ticker_throws_exception_when_price_missing(): void
     {
         Http::fake([
-            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response([
-                'symbol' => 'BTCUSDT',
+            $this->baseUrl.'/v1/spot/public/ticker/price*' => Http::response([
+                'code' => 200,
+                'msg' => 'SUCCESS',
+                'msgInfo' => [],
+                'data' => [
+                    ['s' => 'btc_usdt'],
+                ],
             ], 200),
         ]);
 
@@ -159,7 +164,7 @@ class JbexConnectorTest extends TestCase
     public function test_fetch_ticker_throws_exception_on_http_error(): void
     {
         Http::fake([
-            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response([], 500),
+            $this->baseUrl.'/v1/spot/public/ticker/price*' => Http::response([], 500),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -176,7 +181,7 @@ class JbexConnectorTest extends TestCase
     public function test_fetch_markets_throws_exception_on_invalid_response(): void
     {
         Http::fake([
-            $this->baseUrl.'/openapi/v1/brokerInfo*' => Http::response([
+            $this->baseUrl.'/v1/spot/public/symbol*' => Http::response([
                 'invalid' => 'data',
             ], 200),
         ]);
@@ -184,7 +189,7 @@ class JbexConnectorTest extends TestCase
         $connector = $this->app->make('exchange.jbex');
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Invalid brokerInfo response format');
+        $this->expectExceptionMessage('Invalid symbol response format');
 
         $connector->fetchMarkets();
     }
@@ -227,12 +232,17 @@ class JbexConnectorTest extends TestCase
     public function test_symbol_normalization_in_fetch_tickers(): void
     {
         $fixtureData = [
-            ['symbol' => 'BTCUSDT', 'price' => '42150.50'],
-            ['symbol' => 'ETHUSDT', 'price' => '2234.10'],
+            'code' => 200,
+            'msg' => 'SUCCESS',
+            'msgInfo' => [],
+            'data' => [
+                ['s' => 'btc_usdt', 't' => 1700000000000, 'p' => '42150.50'],
+                ['s' => 'eth_usdt', 't' => 1700000000000, 'p' => '2234.10'],
+            ],
         ];
 
         Http::fake([
-            $this->baseUrl.'/openapi/quote/v1/ticker/price*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/v1/spot/public/ticker/price*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
@@ -253,7 +263,7 @@ class JbexConnectorTest extends TestCase
         );
 
         Http::fake([
-            $this->baseUrl.'/openapi/v1/brokerInfo*' => Http::response($fixtureData, 200),
+            $this->baseUrl.'/v1/spot/public/symbol*' => Http::response($fixtureData, 200),
         ]);
 
         $connector = $this->app->make('exchange.jbex');
