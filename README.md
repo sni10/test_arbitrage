@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](https://github.com/sni10/test_arbitrage/blob/main/LICENSE)
 [![Latest Release](https://img.shields.io/github/v/release/sni10/test_arbitrage?style=for-the-badge&logo=github)](https://github.com/sni10/test_arbitrage/releases/latest)
 [![Tests](https://img.shields.io/github/actions/workflow/status/sni10/test_arbitrage/tests.yml?style=for-the-badge&logo=github&label=Tests)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
-[![Coverage](https://img.shields.io/badge/coverage-85.4%25-brightgreen?style=for-the-badge&logo=codecov&logoColor=white)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/badge/coverage-89.1%25-brightgreen?style=for-the-badge&logo=codecov&logoColor=white)](https://github.com/sni10/test_arbitrage/actions/workflows/tests.yml)
 
 # Arbitrage Analyzer
 
@@ -221,6 +221,37 @@ Found 5 opportunities:
 | MORPHO/USDT | Poloniex | 0.40000000 | Binance  | 1.22900000 | 207.25%     |
 +-------------+----------+------------+----------+------------+-------------+
 ═══════════════════════════════════════════════════════
+```
+
+</details>
+
+-----------------------------------
+
+<details>
+  <summary> OUTPUT Примеры общего форматирования валютных пар </summary>
+
+
+```terminaloutput
+Binance: 1621
+sample: ETH/BTC, LTC/BTC, BNB/BTC, NEO/BTC, QTUM/ETH, GAS/BTC, BNB/ETH, BTC/USDT, ETH/USDT, 
+LRC/BTC, LRC/ETH, KNC/BTC, IOTA/BTC, IOTA/ETH, LINK/BTC, LINK/ETH, XVG/ETH, MTL/BTC, ETC/ETH, 
+ETC/BTC, ZEC/BTC, ZEC/ETH, DASH/BTC, DASH/ETH, REQ/BTC
+JBEX: 379
+sample: BTC/USDT, ETH/USDT, X/USDT, AIC/USDT, XRP/USDT, BNB/USDT, SOL/USDT, USDC/USDT, ADA/USDT,
+DOGE/USDT, TRX/USDT, JU/USDT, LINK/USDT, XLM/USDT, BCH/USDT, SUI/USDT, AVAX/USDT, USD1/USDT, 
+HBAR/USDT, TRUMP/USDT, LTC/USDT, TON/USDT, SHIB/USDT, UNI/USDT, DOT/USDT
+Poloniex: 954
+sample: DASH/BTC, DOGE/BTC, LTC/BTC, XLM/BTC, XEM/BTC, XMR/BTC, XRP/BTC, BTC/USDT,
+DASH/USDT, LTC/USDT, XLM/USDT, XMR/USDT, XRP/USDT, ETH/BTC, ETH/USDT, SC/BTC, STEEM/BTC,
+ETC/BTC, ETC/ETH, ETC/USDT, ARDR/BTC, ZEC/BTC, ZEC/ETH, ZEC/USDT, ZRX/ETH
+Bybit: 655
+sample: BTC/USDT, ETH/USDT, XRP/USDT, ETH/BTC, XRP/BTC, DOT/USDT, XLM/USDT, LTC/USDT,
+DOGE/USDT, CHZ/USDT, AXS/USDT, MANA/USDT, DYDX/USDT, COMP/USDT, AAVE/USDT, YFI/USDT,
+LINK/USDT, SUSHI/USDT, UNI/USDT, KSM/USDT, ICP/USDT, ADA/USDT, ETC/USDT, XTZ/USDT, BCH/USDT
+WhiteBIT: 759
+sample: ETH/BTC, BTC/USD, ETH/USD, LTC/BTC, LTC/USD, XLM/BTC, BCH/BTC, NEO/BTC, ETC/BTC,
+ZRX/USDT, ZIL/USDT, BAT/USDT, CCOH/BTC, BTC/USDT, ETH/USDT, BTC/UAH, ETH/UAH, TRX/BTC,
+TRX/ETH, TRX/USDT, BTC/EUR, ETH/EUR, XRP/BTC, XRP/USDT, XRP/EUR
 ```
 
 </details>
