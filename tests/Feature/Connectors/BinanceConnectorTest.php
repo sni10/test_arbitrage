@@ -6,6 +6,8 @@ use App\Domain\Entities\Ticker;
 use App\Infrastructure\Connectors\BinanceConnector;
 use App\Infrastructure\Factories\CcxtClientFactory;
 use ccxt\Exchange;
+use ccxt\ExchangeError;
+use ccxt\NetworkError;
 use Tests\TestCase;
 
 /**
@@ -92,6 +94,34 @@ class BinanceConnectorTest extends TestCase
     }
 
     /**
+     * Test fetchTickers skips entries without price data.
+     */
+    public function test_fetch_tickers_skips_entries_without_price_data(): void
+    {
+        $fixtureData = json_decode(
+            file_get_contents(base_path('tests/Fixtures/ccxt_ticker.json')),
+            true
+        );
+
+        $tickersData = [
+            'BTC/USDT' => $fixtureData,
+            'ETH/USDT' => ['symbol' => 'ETH/USDT'],
+        ];
+
+        $this->mockExchange->markets = ['BTC/USDT' => [], 'ETH/USDT' => []];
+        $this->mockExchange
+            ->expects($this->once())
+            ->method('fetch_tickers')
+            ->willReturn($tickersData);
+
+        $tickers = $this->connector->fetchTickers();
+
+        $this->assertIsArray($tickers);
+        $this->assertCount(1, $tickers);
+        $this->assertSame('BTC/USDT', $tickers[0]->symbol);
+    }
+
+    /**
      * Test fetchMarkets returns array of market structures.
      */
     public function test_fetch_markets_returns_array_of_markets(): void
@@ -122,6 +152,31 @@ class BinanceConnectorTest extends TestCase
         $this->assertSame('ETH/USDT', $markets[1]['symbol']);
         $this->assertTrue($markets[0]['active']);
         $this->assertTrue($markets[0]['spot']);
+    }
+
+    /**
+     * Test fetchMarkets skips load_markets when markets already cached.
+     */
+    public function test_fetch_markets_uses_cached_markets_when_available(): void
+    {
+        $fixtureData = json_decode(
+            file_get_contents(base_path('tests/Fixtures/ccxt_markets.json')),
+            true
+        );
+
+        $this->mockExchange->markets = ['BTC/USDT' => []];
+        $this->mockExchange
+            ->expects($this->never())
+            ->method('load_markets');
+
+        $this->mockExchange
+            ->expects($this->once())
+            ->method('fetch_markets')
+            ->willReturn($fixtureData);
+
+        $markets = $this->connector->fetchMarkets();
+
+        $this->assertCount(3, $markets);
     }
 
     /**
@@ -180,6 +235,63 @@ class BinanceConnectorTest extends TestCase
         $this->expectExceptionMessage('No price data available');
 
         $this->connector->fetchTicker('BTC/USDT');
+    }
+
+    /**
+     * Test fetchTicker retries on network errors.
+     */
+    public function test_fetch_ticker_retries_on_network_error(): void
+    {
+        config(['RATE_LIMIT_DELAY' => 0]);
+
+        $fixtureData = json_decode(
+            file_get_contents(base_path('tests/Fixtures/ccxt_ticker.json')),
+            true
+        );
+
+        $mockExchange = $this->createMock(Exchange::class);
+        $mockExchange->markets = ['BTC/USDT' => []];
+
+        $attempt = 0;
+        $mockExchange
+            ->expects($this->exactly(3))
+            ->method('fetch_ticker')
+            ->with('BTC/USDT')
+            ->willReturnCallback(function () use (&$attempt, $fixtureData) {
+                $attempt++;
+                if ($attempt < 3) {
+                    throw new NetworkError('temporary');
+                }
+
+                return $fixtureData;
+            });
+
+        $connector = new BinanceConnector($mockExchange);
+
+        $ticker = $connector->fetchTicker('BTC/USDT');
+
+        $this->assertSame(36500.0, $ticker->price);
+    }
+
+    /**
+     * Test fetchTicker throws exception on exchange error without retry.
+     */
+    public function test_fetch_ticker_throws_exception_on_exchange_error(): void
+    {
+        $mockExchange = $this->createMock(Exchange::class);
+        $mockExchange->markets = ['BTC/USDT' => []];
+        $mockExchange
+            ->expects($this->once())
+            ->method('fetch_ticker')
+            ->with('BTC/USDT')
+            ->willThrowException(new ExchangeError('Invalid symbol'));
+
+        $connector = new BinanceConnector($mockExchange);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Binance API error');
+
+        $connector->fetchTicker('BTC/USDT');
     }
 
     /**
