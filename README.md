@@ -31,19 +31,13 @@
 
 ## Установка
 
-### 1. Создать сеть Docker (однократно)
-
-```powershell
-docker network create internal_sync_network
-```
-
-### 2. Запустить сервисы
+### 1. Запустить сервисы
 
 ```powershell
 $env:APP_ENV = "test"
 docker compose up -d --build
 ```
-### 3. Настроить .env (опционально)
+### 2. Настроить .env (опционально)
 
 Скопируйте `.env.example` в `.env` и настройте параметры:
 
@@ -68,15 +62,6 @@ JBEX_API_SECRET=your_api_secret
 docker compose exec -T php-arb php artisan arb:price BTC/USDT
 ```
 
-**Вывод:**
-```
-Trading Pair: BTC/USDT
-Min Price: 42150.50 (Binance)
-Max Price: 42380.20 (Bybit)
-Difference: 229.70 (0.545%)
-Exchanges checked: 5
-```
-
 ### Команда: arb:opportunities
 
 Найти арбитражные возможности с фильтрацией.
@@ -94,175 +79,122 @@ docker compose exec -T php-arb php artisan arb:opportunities --top=10
 # Комбинация фильтров
 docker compose exec -T php-arb php artisan arb:opportunities --min-profit=0.3 --top=5
 ```
+-----------------------------------
 
 <details>
-  <summary> OUTPUT </summary>
+  <summary> OUTPUT docker compose exec -T php-arb php artisan arb:price BTC/USDT</summary>
 
 ```terminaloutput
+Fetching prices for BTC/USDT...
+
 ═══════════════════════════════════════════════════════
   Best Prices for BTC/USDT
 ═══════════════════════════════════════════════════════
 
 Lowest Price:
   Exchange:  Poloniex
-  Price:     89652.05
-  Time:      57945-07-06 22:44:14
+  Price:     87157.44
+  Time:      57947-03-30 03:04:10
 
 Highest Price:
   Exchange:  Binance
-  Price:     89703.99
-  Time:      57945-07-06 23:20:13
+  Price:     87179.99
+  Time:      57947-03-30 02:50:01
 
 Price Difference:
-  Absolute:  51.940000000002
-  Percent:   0.057935094624163%
+  Absolute:  22.550000000003
+  Percent:   0.025872719529168%
 
 Statistics:
-  Exchanges checked: 4
+  Exchanges checked: 5
 ═══════════════════════════════════════════════════════
 ```
 
 </details>
 
+-----------------------------------
 
 <details>
   <summary> OUTPUT docker compose exec -T php-arb php artisan arb:opportunities </summary>
 
 ```terminaloutput
+Searching for arbitrage opportunities...
+
 ═══════════════════════════════════════════════════════
-Arbitrage Opportunities
+  Arbitrage Opportunities
 ═══════════════════════════════════════════════════════
 
 Filters Applied:
-Min Profit:    0.1%
-Top Results:   All
-Pairs Checked: 127
+  Min Profit:    0.1%
+  Top Results:   All
+  Pairs Checked: 75
 
-Found 115 opportunities:
+Found 54 opportunities:
 
 +-------------+----------+-----------------+----------+-----------------+-------------+
 | Pair        | Buy From | Buy Price       | Sell To  | Sell Price      | Profit %    |
 +-------------+----------+-----------------+----------+-----------------+-------------+
-| KAIA/USDT   | Poloniex | 0.00000910      | Binance  | 0.06020000      | 661,438.46% |
-| TRUMP/USDT  | Poloniex | 0.06000000      | Binance  | 5.03200000      | 8,286.67%   |
-| RED/USDT    | Poloniex | 0.02100000      | Binance  | 0.21600000      | 928.57%     |
-| PORTAL/USDT | WhiteBIT | 0.02290000      | Poloniex | 0.11100000      | 384.72%     |
-| MORPHO/USDT | Poloniex | 0.40000000      | Binance  | 1.23000000      | 207.50%     |
-| JTO/USDT    | WhiteBIT | 0.35800000      | Poloniex | 0.77300000      | 115.92%     |
-| ALT/USDT    | Poloniex | 0.00582000      | Binance  | 0.01166000      | 100.34%     |
-| LUNA/USDT   | Poloniex | 0.06200000      | Binance  | 0.11610000      | 87.26%      |
-| STX/USDT    | WhiteBIT | 0.25220000      | Poloniex | 0.42000000      | 66.53%      |
-| HAEDAL/USDT | Poloniex | 0.02360000      | Binance  | 0.03840000      | 62.71%      |
-| GALA/USDT   | Binance  | 0.00626000      | Poloniex | 0.00999000      | 59.58%      |
-| TOWNS/USDT  | Binance  | 0.00556000      | Poloniex | 0.00847000      | 52.34%      |
-| NEWT/USDT   | Poloniex | 0.06670000      | Binance  | 0.09980000      | 49.63%      |
-| RENDER/USDT | WhiteBIT | 1.31400000      | Poloniex | 1.83060000      | 39.32%      |
-| AIXBT/USDT  | WhiteBIT | 0.02910000      | Poloniex | 0.04030000      | 38.49%      |
-| APE/USDT    | Poloniex | 0.15000000      | Binance  | 0.20040000      | 33.60%      |
-| BLUR/USDT   | WhiteBIT | 0.02790000      | Poloniex | 0.03540000      | 26.88%      |
-| AVNT/USDT   | WhiteBIT | 0.26350000      | Poloniex | 0.33130000      | 25.73%      |
-| EGLD/USDT   | WhiteBIT | 6.41920000      | Poloniex | 7.91000000      | 23.22%      |
-| LUNC/USDT   | Poloniex | 0.00003300      | Binance  | 0.00004006      | 21.39%      |
-| WLFI/USDT   | Poloniex | 0.11320000      | Binance  | 0.13510000      | 19.35%      |
-| TNSR/USDT   | Binance  | 0.08490000      | Poloniex | 0.10130000      | 19.32%      |
-| GMX/USDT    | Poloniex | 7.18000000      | WhiteBIT | 8.40000000      | 16.99%      |
-| SNX/USDT    | Binance  | 0.42500000      | Poloniex | 0.49200000      | 15.76%      |
-| WOO/USDT    | Poloniex | 0.02340000      | Binance  | 0.02680000      | 14.53%      |
-| ID/USDT     | WhiteBIT | 0.06147000      | Poloniex | 0.07000000      | 13.88%      |
-| KSM/USDT    | WhiteBIT | 7.02900000      | Poloniex | 8.00000000      | 13.81%      |
-| UMA/USDT    | WhiteBIT | 0.70990000      | Poloniex | 0.80700000      | 13.68%      |
-| PEOPLE/USDT | Poloniex | 0.00850000      | WhiteBIT | 0.00950600      | 11.84%      |
-| CAKE/USDT   | Poloniex | 1.68900000      | Binance  | 1.85800000      | 10.01%      |
-| CGPT/USDT   | WhiteBIT | 0.02898000      | Poloniex | 0.03180000      | 9.73%       |
-| BICO/USDT   | Poloniex | 0.03830000      | WhiteBIT | 0.04200000      | 9.66%       |
-| ZK/USDT     | Poloniex | 0.02530000      | WhiteBIT | 0.02762000      | 9.17%       |
-| LINEA/USDT  | Poloniex | 0.00601000      | Binance  | 0.00653000      | 8.65%       |
-| BOME/USDT   | Poloniex | 0.00054550      | Binance  | 0.00059000      | 8.16%       |
-| NXPC/USDT   | Poloniex | 0.35700000      | Binance  | 0.38530000      | 7.93%       |
-| MET/USDT    | Poloniex | 0.22600000      | Binance  | 0.24300000      | 7.52%       |
-| BAT/USDT    | WhiteBIT | 0.21280000      | Poloniex | 0.22860000      | 7.42%       |
-| GMT/USDT    | Poloniex | 0.01370000      | WhiteBIT | 0.01467000      | 7.08%       |
-| NEXO/USDT   | WhiteBIT | 0.93470000      | Poloniex | 1.00000000      | 6.99%       |
-| RUNE/USDT   | Poloniex | 0.55450000      | Binance  | 0.59200000      | 6.76%       |
-| S/USDT      | WhiteBIT | 0.07500000      | Poloniex | 0.08000000      | 6.67%       |
-| BONK/USDT   | Poloniex | 0.00000770      | Binance  | 0.00000821      | 6.65%       |
-| FXS/USDT    | Poloniex | 0.62000000      | WhiteBIT | 0.66100000      | 6.61%       |
-| CRV/USDT    | Poloniex | 0.35000000      | WhiteBIT | 0.37310000      | 6.60%       |
-| WAL/USDT    | Poloniex | 0.12000000      | Binance  | 0.12740000      | 6.17%       |
-| ONDO/USDT   | Poloniex | 0.37670000      | Binance  | 0.39970000      | 6.11%       |
-| AXS/USDT    | Poloniex | 0.81000000      | Binance  | 0.85900000      | 6.05%       |
-| PENDLE/USDT | Poloniex | 1.80000000      | Binance  | 1.90800000      | 6.00%       |
-| JUP/USDT    | Poloniex | 0.18600000      | Binance  | 0.19530000      | 5.00%       |
-| RPL/USDT    | WhiteBIT | 1.86000000      | Poloniex | 1.95000000      | 4.84%       |
-| QTUM/USDT   | WhiteBIT | 1.26960000      | Poloniex | 1.32800000      | 4.60%       |
-| ENA/USDT    | Poloniex | 0.20220000      | Binance  | 0.21090000      | 4.30%       |
-| AGLD/USDT   | WhiteBIT | 0.25000000      | Poloniex | 0.26000000      | 4.00%       |
-| RDNT/USDT   | WhiteBIT | 0.00937000      | Poloniex | 0.00970000      | 3.52%       |
-| LRC/USDT    | Poloniex | 0.05450000      | Binance  | 0.05630000      | 3.30%       |
-| SSV/USDT    | WhiteBIT | 3.76530000      | Poloniex | 3.88000000      | 3.05%       |
-| EIGEN/USDT  | Binance  | 0.39200000      | Poloniex | 0.40300000      | 2.81%       |
-| XTZ/USDT    | Poloniex | 0.44000000      | Binance  | 0.45100000      | 2.50%       |
-| ENJ/USDT    | Poloniex | 0.02680000      | Binance  | 0.02741000      | 2.28%       |
-| C98/USDT    | WhiteBIT | 0.02200000      | Poloniex | 0.02250000      | 2.27%       |
-| OM/USDT     | Binance  | 0.07070000      | Poloniex | 0.07197000      | 1.80%       |
-| INJ/USDT    | Poloniex | 4.60010000      | Binance  | 4.68200000      | 1.78%       |
-| LTC/BTC     | Poloniex | 0.00086400      | Binance  | 0.00087900      | 1.74%       |
-| ENS/USDT    | WhiteBIT | 9.66270000      | Poloniex | 9.82000000      | 1.63%       |
-| ZRO/USDT    | Binance  | 1.31300000      | Poloniex | 1.33300000      | 1.52%       |
-| STRK/USDT   | Poloniex | 0.08000000      | Binance  | 0.08120000      | 1.50%       |
-| WIF/USDT    | WhiteBIT | 0.33890000      | Poloniex | 0.34380000      | 1.45%       |
-| YFI/USDT    | Poloniex | 3,380.14000000  | Binance  | 3,427.00000000  | 1.39%       |
-| SUSHI/USDT  | WhiteBIT | 0.29730000      | Poloniex | 0.30130000      | 1.35%       |
-| CHZ/USDT    | WhiteBIT | 0.03551400      | Poloniex | 0.03597000      | 1.28%       |
-| GRT/USDT    | Poloniex | 0.03810000      | Binance  | 0.03853000      | 1.13%       |
-| G/USDT      | WhiteBIT | 0.00445000      | Poloniex | 0.00450000      | 1.12%       |
-| AEVO/USDT   | Poloniex | 0.03600000      | Binance  | 0.03640000      | 1.11%       |
-| ETHFI/USDT  | WhiteBIT | 0.71900000      | Poloniex | 0.72660000      | 1.06%       |
-| TRX/USDC    | WhiteBIT | 0.28325800      | Poloniex | 0.28608000      | 1.00%       |
-| SKY/USDT    | Binance  | 0.06760000      | Poloniex | 0.06823000      | 0.93%       |
-| FET/USDT    | Poloniex | 0.20800000      | Binance  | 0.20960000      | 0.77%       |
-| COMP/USDT   | Poloniex | 24.00000000     | WhiteBIT | 24.18000000     | 0.75%       |
-| ICP/USDT    | Binance  | 3.05400000      | Poloniex | 3.07200000      | 0.59%       |
-| SOL/BTC     | Poloniex | 0.00141500      | WhiteBIT | 0.00142173      | 0.48%       |
-| SAND/USDT   | Poloniex | 0.11700000      | WhiteBIT | 0.11753600      | 0.46%       |
-| DOT/BTC     | Binance  | 0.00002041      | Poloniex | 0.00002050      | 0.44%       |
-| IMX/USDT    | Binance  | 0.23100000      | WhiteBIT | 0.23200000      | 0.43%       |
-| ASTER/USDT  | Poloniex | 0.70700000      | WhiteBIT | 0.71000000      | 0.42%       |
-| JST/USDT    | Binance  | 0.03979000      | Poloniex | 0.03994000      | 0.38%       |
-| XLM/BTC     | WhiteBIT | 0.00000250      | Binance  | 0.00000251      | 0.37%       |
-| TON/USDT    | WhiteBIT | 1.46600000      | Poloniex | 1.47100000      | 0.34%       |
-| AAVE/USDT   | Poloniex | 154.84000000    | Binance  | 155.35000000    | 0.33%       |
-| SUI/USDT    | Poloniex | 1.47180000      | Binance  | 1.47660000      | 0.33%       |
-| BTC/USDC    | Poloniex | 89,219.77000000 | WhiteBIT | 89,496.75000000 | 0.31%       |
-| ARB/USDT    | WhiteBIT | 0.18970000      | Poloniex | 0.19020000      | 0.26%       |
-| LDO/USDT    | WhiteBIT | 0.54860000      | Poloniex | 0.55000000      | 0.26%       |
-| PEPE/USDT   | WhiteBIT | 0.00000402      | Binance  | 0.00000403      | 0.22%       |
-| ETH/USDC    | Poloniex | 3,032.90000000  | Binance  | 3,039.27000000  | 0.21%       |
-| ADA/USDT    | WhiteBIT | 0.37602700      | Binance  | 0.37680000      | 0.21%       |
-| LTC/USDC    | WhiteBIT | 78.66000000     | Poloniex | 78.82000000     | 0.20%       |
-| DOT/USDT    | WhiteBIT | 1.82650000      | Binance  | 1.83000000      | 0.19%       |
-| POL/USDT    | WhiteBIT | 0.10890000      | Poloniex | 0.10910000      | 0.18%       |
-| A/USDT      | Poloniex | 0.16420000      | Binance  | 0.16450000      | 0.18%       |
-| XRP/USDC    | Poloniex | 1.92460000      | Binance  | 1.92810000      | 0.18%       |
-| ZRX/USDT    | WhiteBIT | 0.12130000      | Poloniex | 0.12150000      | 0.16%       |
-| MANA/USDT   | Poloniex | 0.12480000      | Binance  | 0.12500000      | 0.16%       |
-| FIL/USDT    | Poloniex | 1.31400000      | Binance  | 1.31600000      | 0.15%       |
-| FLOKI/USDT  | WhiteBIT | 0.00004083      | Poloniex | 0.00004089      | 0.15%       |
-| SHIB/USDT   | Poloniex | 0.00000732      | Binance  | 0.00000733      | 0.14%       |
-| DOGE/USDT   | WhiteBIT | 0.13354340      | Binance  | 0.13372000      | 0.13%       |
-| NEAR/USDT   | Poloniex | 1.55400000      | Binance  | 1.55600000      | 0.13%       |
-| LINK/USDT   | Poloniex | 12.73460000     | Binance  | 12.75000000     | 0.12%       |
-| XRP/BTC     | Binance  | 0.00002154      | WhiteBIT | 0.00002156      | 0.11%       |
-| ATOM/USDT   | WhiteBIT | 1.97880000      | Binance  | 1.98100000      | 0.11%       |
-| OP/USDT     | WhiteBIT | 0.27590000      | Binance  | 0.27620000      | 0.11%       |
-| BTC/USDT    | Poloniex | 89,376.77000000 | Binance  | 89,470.00000000 | 0.10%       |
-| SUN/USDT    | Binance  | 0.02041000      | Poloniex | 0.02043110      | 0.10%       |
-| SOL/USDT    | WhiteBIT | 127.03000000    | Binance  | 127.16000000    | 0.10%       |
+| KAIA/USDT   | Poloniex | 0.00000910      | Binance  | 0.05810000      | 638,361.54% |
+| TRUMP/USDT  | Poloniex | 0.06000000      | Binance  | 4.91200000      | 8,086.67%   |
+| RED/USDT    | Poloniex | 0.02100000      | WhiteBIT | 0.21090000      | 904.29%     |
+| MORPHO/USDT | Poloniex | 0.40000000      | Binance  | 1.19000000      | 197.50%     |
+| JTO/USDT    | Binance  | 0.35200000      | Poloniex | 0.77300000      | 119.60%     |
+| TOWNS/USDT  | WhiteBIT | 0.00549000      | Poloniex | 0.00847000      | 54.28%      |
+| RENDER/USDT | Binance  | 1.26100000      | Poloniex | 1.83060000      | 45.17%      |
+| AIXBT/USDT  | Binance  | 0.02810000      | Poloniex | 0.04030000      | 43.42%      |
+| GALA/USDT   | WhiteBIT | 0.00605900      | Poloniex | 0.00750000      | 23.78%      |
+| TNSR/USDT   | WhiteBIT | 0.08230000      | Poloniex | 0.10130000      | 23.09%      |
+| AVNT/USDT   | WhiteBIT | 0.28040000      | Poloniex | 0.33130000      | 18.15%      |
+| WLFI/USDT   | Poloniex | 0.11320000      | JBEX     | 0.13230000      | 16.87%      |
+| CGPT/USDT   | WhiteBIT | 0.02818000      | Poloniex | 0.03180000      | 12.85%      |
+| S/USDT      | WhiteBIT | 0.07140000      | Poloniex | 0.08000000      | 12.04%      |
+| PEOPLE/USDT | Poloniex | 0.00850000      | WhiteBIT | 0.00925600      | 8.89%       |
+| ZK/USDT     | Poloniex | 0.02530000      | Binance  | 0.02751000      | 8.74%       |
+| CRV/USDT    | Poloniex | 0.35000000      | Binance  | 0.37680000      | 7.66%       |
+| CAKE/USDT   | Poloniex | 1.68900000      | JBEX     | 1.80500000      | 6.87%       |
+| WIF/USDT    | WhiteBIT | 0.32440000      | Poloniex | 0.34380000      | 5.98%       |
+| ONDO/USDT   | Poloniex | 0.36750000      | Binance  | 0.38700000      | 5.31%       |
+| LINEA/USDT  | Poloniex | 0.00601000      | WhiteBIT | 0.00631000      | 4.99%       |
+| ENS/USDT    | WhiteBIT | 9.41050000      | Poloniex | 9.82000000      | 4.35%       |
+| EIGEN/USDT  | JBEX     | 0.38700000      | Poloniex | 0.40300000      | 4.13%       |
+| OM/USDT     | JBEX     | 0.06930000      | Poloniex | 0.07197000      | 3.85%       |
+| BONK/USDT   | Poloniex | 0.00000770      | Binance  | 0.00000799      | 3.79%       |
+| SUSHI/USDT  | Poloniex | 0.28050000      | JBEX     | 0.29100000      | 3.74%       |
+| SSV/USDT    | JBEX     | 3.75000000      | Poloniex | 3.88000000      | 3.47%       |
+| XTZ/USDT    | Poloniex | 0.42410000      | JBEX     | 0.43860000      | 3.42%       |
+| STRK/USDT   | Binance  | 0.07780000      | Poloniex | 0.08000000      | 2.83%       |
+| ETH/USDC    | WhiteBIT | 2,955.72000000  | Poloniex | 3,032.90000000  | 2.61%       |
+| XRP/USDC    | WhiteBIT | 1.87689000      | Poloniex | 1.92490000      | 2.56%       |
+| JUP/USDT    | Poloniex | 0.18600000      | Binance  | 0.19010000      | 2.20%       |
+| FET/USDT    | Binance  | 0.20390000      | Poloniex | 0.20800000      | 2.01%       |
+| PENDLE/USDT | WhiteBIT | 1.76580000      | Poloniex | 1.80010000      | 1.94%       |
+| WAL/USDT    | Poloniex | 0.12000000      | Binance  | 0.12150000      | 1.25%       |
+| IMX/USDT    | Binance  | 0.22300000      | Poloniex | 0.22550000      | 1.12%       |
+| ENA/USDT    | Binance  | 0.20020000      | Poloniex | 0.20220000      | 1.00%       |
+| ASTER/USDT  | Binance  | 0.69200000      | Poloniex | 0.69760000      | 0.81%       |
+| INJ/USDT    | WhiteBIT | 4.57100000      | Poloniex | 4.60010000      | 0.64%       |
+| TON/USDT    | Poloniex | 1.44300000      | Binance  | 1.45100000      | 0.55%       |
+| ICP/USDT    | WhiteBIT | 3.01900000      | Poloniex | 3.03200000      | 0.43%       |
+| LTC/USDC    | Poloniex | 76.52000000     | Binance  | 76.77000000     | 0.33%       |
+| BTC/USDC    | WhiteBIT | 87,218.52000000 | Poloniex | 87,501.01000000 | 0.32%       |
+| SAND/USDT   | Poloniex | 0.11320000      | JBEX     | 0.11350000      | 0.27%       |
+| BCH/USDT    | WhiteBIT | 579.47000000    | Poloniex | 580.70000000    | 0.21%       |
+| PEPE/USDT   | Poloniex | 0.00000394      | Binance  | 0.00000395      | 0.21%       |
+| ARB/USDT    | Binance  | 0.18470000      | Poloniex | 0.18500000      | 0.16%       |
+| FIL/USDT    | WhiteBIT | 1.27010000      | Binance  | 1.27200000      | 0.15%       |
+| UNI/USDT    | Poloniex | 6.02140000      | Binance  | 6.02900000      | 0.13%       |
+| FLOKI/USDT  | WhiteBIT | 0.00003987      | Binance  | 0.00003992      | 0.13%       |
+| ETH/BTC     | Poloniex | 0.03386000      | JBEX     | 0.03390000      | 0.12%       |
+| SKY/USDT    | WhiteBIT | 0.06410000      | Poloniex | 0.06417000      | 0.11%       |
+| ETC/USDT    | Poloniex | 12.07700000     | Binance  | 12.09000000     | 0.11%       |
+| AAVE/USDT   | JBEX     | 153.02000000    | Poloniex | 153.18000000    | 0.10%       |
 +-------------+----------+-----------------+----------+-----------------+-------------+
 ═══════════════════════════════════════════════════════
 ```
 
 </details>
+
+-----------------------------------
 
 <details>
   <summary> OUTPUT docker compose exec -T php-arb php artisan arb:opportunities --min-profit=0.3 --top=5 </summary>
@@ -293,20 +225,7 @@ Found 5 opportunities:
 
 </details>
 
-
-**Вывод:**
-```
-+----------+----------+-------------+----------+-------------+
-| Pair     | Buy      | Buy Price   | Sell     | Sell Price  | Profit % |
-+----------+----------+-------------+----------+-------------+
-| BTC/USDT | Binance  | 42150.50    | Bybit    | 42380.20    | 0.545%   |
-| ETH/USDT | Binance  | 2234.10     | Bybit    | 2245.80     | 0.524%   |
-+----------+----------+-------------+----------+-------------+
-
-Total opportunities: 2
-Pairs checked: 15
-Min profit filter: 0.1%
-```
+-----------------------------------
 
 ## Тестирование
 
