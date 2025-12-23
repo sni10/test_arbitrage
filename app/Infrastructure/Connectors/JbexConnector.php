@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Log;
  * via injected HttpClientFactory.
  *
  * API specifics:
- * - Base URL: https://api.jbex.com
- * - Authentication: X-BH-APIKEY header
- * - Symbol format: BTCUSDT (no separator), normalized to BTC/USDT
- * - Endpoints: /openapi/v1/brokerInfo, /openapi/quote/v1/ticker/price
+ * - Base URL: https://api.jucoin.com
+ * - Authentication: public endpoints require no auth
+ * - Symbol format: btc_usdt (underscore, lowercase), normalized to BTC/USDT
+ * - Endpoints: /v1/spot/public/symbol, /v1/spot/public/ticker/price
  */
 class JbexConnector implements ExchangeConnectorInterface
 {
@@ -48,21 +48,27 @@ class JbexConnector implements ExchangeConnectorInterface
      */
     public function fetchTicker(string $symbol): Ticker
     {
-        $jbexSymbol = $this->denormalizeSymbol($symbol);
+        $apiSymbol = $this->denormalizeSymbol($symbol);
         $url = $this->baseUrl.$this->endpoints['ticker_price'];
 
-        $data = $this->executeHttpRequest($url, ['symbol' => $jbexSymbol]);
+        $payload = $this->executeHttpRequest($url, ['symbol' => $apiSymbol]);
+        $data = $payload['data'] ?? null;
 
-        // JBEX ticker/price returns: {"symbol": "BTCUSDT", "price": "42150.50"}
-        if (! isset($data['price'])) {
+        if (is_array($data) && array_key_exists('p', $data)) {
+            $tickerData = $data;
+        } else {
+            $tickerData = is_array($data) ? ($data[0] ?? null) : null;
+        }
+
+        if (! is_array($tickerData) || ! isset($tickerData['p'])) {
             throw new \Exception("JBEX: No price data available for {$symbol}");
         }
 
         return new Ticker(
             symbol: $symbol,
-            price: (float) $data['price'],
+            price: (float) $tickerData['p'],
             exchange: 'JBEX',
-            timestamp: time() * 1000
+            timestamp: isset($tickerData['t']) ? (int) $tickerData['t'] : (int) (time() * 1000)
         );
     }
 
@@ -72,22 +78,26 @@ class JbexConnector implements ExchangeConnectorInterface
     public function fetchTickers(): array
     {
         $url = $this->baseUrl.$this->endpoints['ticker_price'];
-        $data = $this->executeHttpRequest($url);
+        $payload = $this->executeHttpRequest($url);
+        $data = $payload['data'] ?? null;
         $tickers = [];
 
-        // JBEX returns array of tickers when no symbol specified
+        if (! is_array($data)) {
+            return $tickers;
+        }
+
         foreach ($data as $tickerData) {
-            if (! isset($tickerData['symbol']) || ! isset($tickerData['price'])) {
+            if (! isset($tickerData['s']) || ! isset($tickerData['p'])) {
                 continue;
             }
 
-            $normalizedSymbol = $this->normalizeSymbol($tickerData['symbol']);
+            $normalizedSymbol = $this->normalizeSymbol($tickerData['s']);
 
             $tickers[] = new Ticker(
                 symbol: $normalizedSymbol,
-                price: (float) $tickerData['price'],
+                price: (float) $tickerData['p'],
                 exchange: 'JBEX',
-                timestamp: time() * 1000
+                timestamp: isset($tickerData['t']) ? (int) $tickerData['t'] : (int) (time() * 1000)
             );
         }
 
@@ -104,12 +114,12 @@ class JbexConnector implements ExchangeConnectorInterface
         }
 
         $url = $this->baseUrl.$this->endpoints['broker_info'];
-        $data = $this->executeHttpRequest($url);
+        $payload = $this->executeHttpRequest($url);
+        $data = $payload['data'] ?? null;
         $markets = [];
 
-        // JBEX brokerInfo returns: {"symbols": [...]}
-        if (! isset($data['symbols']) || ! is_array($data['symbols'])) {
-            throw new \Exception('JBEX: Invalid brokerInfo response format');
+        if (! is_array($data) || ! isset($data['symbols']) || ! is_array($data['symbols'])) {
+            throw new \Exception('JBEX: Invalid symbol response format');
         }
 
         foreach ($data['symbols'] as $marketData) {
@@ -118,7 +128,9 @@ class JbexConnector implements ExchangeConnectorInterface
             }
 
             $symbol = $marketData['symbol'];
-            $normalizedSymbol = $this->normalizeSymbol($symbol);
+            $base = $marketData['baseCurrency'] ?? null;
+            $quote = $marketData['quoteCurrency'] ?? null;
+            $normalizedSymbol = $this->normalizeSymbol($symbol, $base, $quote);
 
             // Parse BASE and QUOTE from normalized symbol
             $parts = explode('/', $normalizedSymbol);
@@ -133,7 +145,9 @@ class JbexConnector implements ExchangeConnectorInterface
                 'quote' => $parts[1],
                 'baseId' => $parts[0],
                 'quoteId' => $parts[1],
-                'active' => ($marketData['status'] ?? 'TRADING') === 'TRADING',
+                'active' => ($marketData['state'] ?? 'ONLINE') === 'ONLINE'
+                    && ($marketData['tradingEnabled'] ?? true)
+                    && ($marketData['openapiEnabled'] ?? true),
                 'spot' => true,
                 'type' => 'spot',
                 'info' => $marketData,
@@ -191,19 +205,42 @@ class JbexConnector implements ExchangeConnectorInterface
             throw new \Exception("JBEX API error: HTTP {$response->status()}");
         }
 
-        return $response->json();
+        $payload = $response->json();
+
+        if (is_array($payload) && isset($payload['code']) && (int) $payload['code'] !== 200) {
+            $message = $payload['msg'] ?? 'Unknown error';
+            Log::error("JBEX API error: code {$payload['code']} for URL: {$url} ({$message})");
+            throw new \Exception("JBEX API error: {$message}");
+        }
+
+        return $payload;
     }
 
     /**
      * Normalize JBEX symbol to BASE/QUOTE format.
      *
-     * Converts BTCUSDT -> BTC/USDT
+     * Converts btc_usdt -> BTC/USDT
      *
-     * @param  string  $symbol  JBEX symbol (e.g., 'BTCUSDT')
+     * @param  string  $symbol  JBEX symbol (e.g., 'btc_usdt')
      * @return string Normalized symbol (e.g., 'BTC/USDT')
      */
-    private function normalizeSymbol(string $symbol): string
+    private function normalizeSymbol(string $symbol, ?string $base = null, ?string $quote = null): string
     {
+        if ($base !== null && $quote !== null && $base !== '' && $quote !== '') {
+            return strtoupper($base).'/'.strtoupper($quote);
+        }
+
+        if (str_contains($symbol, '_')) {
+            [$basePart, $quotePart] = explode('_', $symbol, 2);
+            if ($basePart !== '' && $quotePart !== '') {
+                return strtoupper($basePart).'/'.strtoupper($quotePart);
+            }
+        }
+
+        if (str_contains($symbol, '/')) {
+            return strtoupper($symbol);
+        }
+
         // Common quote currencies to try
         $quotes = ['USDT', 'USDC', 'BTC', 'ETH', 'BNB', 'USD'];
 
@@ -223,13 +260,13 @@ class JbexConnector implements ExchangeConnectorInterface
     /**
      * Denormalize BASE/QUOTE symbol to JBEX format.
      *
-     * Converts BTC/USDT -> BTCUSDT
+     * Converts BTC/USDT -> btc_usdt
      *
      * @param  string  $symbol  Normalized symbol (e.g., 'BTC/USDT')
-     * @return string JBEX symbol (e.g., 'BTCUSDT')
+     * @return string JBEX symbol (e.g., 'btc_usdt')
      */
     private function denormalizeSymbol(string $symbol): string
     {
-        return str_replace('/', '', $symbol);
+        return strtolower(str_replace('/', '_', $symbol));
     }
 }

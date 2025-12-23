@@ -85,26 +85,28 @@ docker compose exec -T php-arb php artisan arb:opportunities --min-profit=0.3 --
   <summary> OUTPUT docker compose exec -T php-arb php artisan arb:price BTC/USDT</summary>
 
 ```terminaloutput
+Fetching prices for BTC/USDT...
+
 ═══════════════════════════════════════════════════════
   Best Prices for BTC/USDT
 ═══════════════════════════════════════════════════════
 
 Lowest Price:
   Exchange:  Poloniex
-  Price:     89652.05
-  Time:      57945-07-06 22:44:14
+  Price:     87157.44
+  Time:      57947-03-30 03:04:10
 
 Highest Price:
   Exchange:  Binance
-  Price:     89703.99
-  Time:      57945-07-06 23:20:13
+  Price:     87179.99
+  Time:      57947-03-30 02:50:01
 
 Price Difference:
-  Absolute:  51.940000000002
-  Percent:   0.057935094624163%
+  Absolute:  22.550000000003
+  Percent:   0.025872719529168%
 
 Statistics:
-  Exchanges checked: 4
+  Exchanges checked: 5
 ═══════════════════════════════════════════════════════
 ```
 

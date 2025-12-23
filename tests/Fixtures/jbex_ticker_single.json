@@ -1,4 +1,12 @@
 {
-  "symbol": "BTCUSDT",
-  "price": "42150.50"
+  "code": 200,
+  "msg": "SUCCESS",
+  "msgInfo": [],
+  "data": [
+    {
+      "s": "btc_usdt",
+      "t": 1700000000000,
+      "p": "42150.50"
+    }
+  ]
 }
