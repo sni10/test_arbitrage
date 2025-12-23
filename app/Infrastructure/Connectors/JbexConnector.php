@@ -146,8 +146,7 @@ class JbexConnector implements ExchangeConnectorInterface
                 'baseId' => $parts[0],
                 'quoteId' => $parts[1],
                 'active' => ($marketData['state'] ?? 'ONLINE') === 'ONLINE'
-                    && ($marketData['tradingEnabled'] ?? true)
-                    && ($marketData['openapiEnabled'] ?? true),
+                    && ($marketData['tradingEnabled'] ?? true),
                 'spot' => true,
                 'type' => 'spot',
                 'info' => $marketData,

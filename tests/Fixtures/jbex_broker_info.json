@@ -10,7 +10,7 @@
         "symbol": "btc_usdt",
         "state": "ONLINE",
         "tradingEnabled": true,
-        "openapiEnabled": true,
+        "openapiEnabled": false,
         "baseCurrency": "btc",
         "quoteCurrency": "usdt"
       },
@@ -18,7 +18,7 @@
         "symbol": "eth_usdt",
         "state": "ONLINE",
         "tradingEnabled": true,
-        "openapiEnabled": true,
+        "openapiEnabled": false,
         "baseCurrency": "eth",
         "quoteCurrency": "usdt"
       },

@@ -7,8 +7,8 @@ services:
                 APP_ENV: ${APP_ENV}
         environment:
             APP_ENV: ${APP_ENV}
-#        volumes:
-#            - ./:/var/www/arb
+        volumes:
+            - ./:/var/www/arb
 
     postgres-arb:
       image: postgres:16
